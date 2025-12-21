@@ -55,7 +55,7 @@ app.get('/admin/generate', (req, res) => {
         </head>
         <body>
           <h1>🔗 Ссылка для ученика</h1>
-          <div class="link" id="link">https://ваш-сайт.onrender.com/exam/${token}</div>
+          <div class="link" id="link">https://control-algebra-1.onrender.com/exam/${token}</div>
           <button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('link').innerText)">
             📋 Скопировать ссылку
           </button>
