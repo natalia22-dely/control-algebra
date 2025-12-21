@@ -5,7 +5,18 @@ const app = express();
 
 // Подключаем базу данных
 const db = new sqlite3.Database('./exam.db');
-
+db.serialize(() => {
+  console.log('✅ База данных подключена');
+  
+  db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='access_log'", 
+    (err, row) => {
+      if (row) {
+        console.log('✅ Таблица access_log существует');
+      } else {
+        console.log('❌ Таблица access_log не найдена, создаем...');
+      }
+    });
+});
 // Создаем таблицы
 db.serialize(() => {
   db.run(`
@@ -102,21 +113,12 @@ app.get('/exam/:token', (req, res) => {
       
       // Проверяем, не заходил ли уже этот IP
       db.get(
-        'SELECT * FROM access_log WHERE ip = ? AND used = 1',
-        [userIP],
-        (err, ipRow) => {
-          if (ipRow) {
-            return res.send(`
-              <!DOCTYPE html>
-              <html>
-              <body style="text-align:center;padding:50px;font-family:Arial;">
-                <h1 style="color:#f57c00;">⚠️ Внимание!</h1>
-                <p>С этого устройства уже был выполнен вход в систему.</p>
-                <p>Каждый ученик может войти только с одного устройства.</p>
-              </body>
-              </html>
-            `);
-          }
+  'SELECT * FROM access_log WHERE token = ?',
+  [token],
+  (err, row) => {
+    if (err || !row) {
+      return res.send('Токен не найден в базе');
+    }
           
           // Помечаем токен как использованный
           db.run(
