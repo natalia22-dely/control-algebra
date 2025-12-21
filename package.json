@@ -1,0 +1,17 @@
+{
+  "name": "school-exam-system",
+  "version": "1.0.0",
+  "description": "Система для проведения онлайн-контрольных работ с защитой",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "sqlite3": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
