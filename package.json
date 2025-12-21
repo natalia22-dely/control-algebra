@@ -1,17 +1,15 @@
 {
   "name": "school-exam-system",
   "version": "1.0.0",
-  "description": "Система для проведения онлайн-контрольных работ с защитой",
+  "description": "Система контрольных работ с загрузкой фоторешений",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.18.0",
-    "sqlite3": "^5.0.0"
+    "sqlite3": "^5.0.0",
+    "multer": "^1.4.5-lts.1"
   },
-  "engines": {
-    "node": ">=14.0.0"
-  }
+  "private": true
 }
