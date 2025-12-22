@@ -16,7 +16,7 @@ const EMAIL_CONFIG = {
   // НАСТРОЙКИ ДЛЯ GMAIL:
   service: 'gmail',
   auth: {
-    user: 'ваш-email@gmail.com', // ⚠️ ЗАМЕНИТЕ на ваш Gmail
+    user: 'nataliafreze22@gmail.com', // ⚠️ ЗАМЕНИТЕ на ваш Gmail
     pass: 'ваш-пароль-приложения' // ⚠️ Пароль приложения (не обычный!)
   }
 };
