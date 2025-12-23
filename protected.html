@@ -3,615 +3,461 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Контрольная работа по математике</title>
+    <title>Проверочная работа по математике</title>
     <style>
         * {
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            font-family: 'Arial', sans-serif;
         }
         
         body {
             margin: 0;
             padding: 20px;
-            font-family: 'Arial', sans-serif;
-            background: #f5f7fa;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
         
         .exam-container {
             background: white;
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
         
         .timer {
             position: fixed;
-            top: 15px;
-            right: 15px;
-            background: #ff4444;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
             color: white;
-            padding: 10px 20px;
-            border-radius: 30px;
+            padding: 15px 30px;
+            border-radius: 50px;
             font-weight: bold;
-            font-size: 20px;
+            font-size: 24px;
             z-index: 1000;
         }
         
-        .task {
-            margin: 25px 0;
-            padding: 20px;
-            background: #f8f9fa;
+        .student-info {
+            background: #e3f2fd;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid #2196F3;
+        }
+        
+        .student-info input {
+            width: 300px;
+            padding: 12px;
+            border: 2px solid #2196F3;
             border-radius: 10px;
-            border-left: 5px solid #3f51b5;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        
+        .task {
+            margin: 30px 0;
+            padding: 25px;
+            border-left: 6px solid #4CAF50;
+            background: #f8f9fa;
+            border-radius: 0 15px 15px 0;
+            transition: transform 0.3s;
+        }
+        
+        .task:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .task-number {
             display: inline-block;
-            background: #3f51b5;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .diagram-container {
-            text-align: center;
-            margin: 20px 0;
-            padding: 15px;
-            background: white;
-            border-radius: 10px;
-            border: 2px solid #e0e0e0;
-        }
-        
-        .diagram-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-        
-        /* Зона загрузки */
-        .upload-zone {
-            margin: 40px 0;
-            padding: 30px;
-            background: #e8f5e9;
-            border-radius: 15px;
-            border: 3px dashed #4CAF50;
-            text-align: center;
-        }
-        
-        .upload-label {
-            display: inline-block;
             background: #4CAF50;
             color: white;
-            padding: 15px 30px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .answer-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px;
+            border: 2px solid #ddd;
             border-radius: 10px;
             font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
+            margin-top: 15px;
+            transition: border 0.3s;
         }
         
-        .upload-label:hover {
-            background: #45a049;
-            transform: translateY(-2px);
-        }
-        
-        #fileInput {
-            display: none;
-        }
-        
-        .file-list {
-            margin-top: 20px;
-            text-align: left;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        .file-item {
-            background: white;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .remove-file {
-            background: #ff4444;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            cursor: pointer;
-            font-size: 14px;
+        .answer-input:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
         }
         
         .submit-btn {
             background: linear-gradient(135deg, #4CAF50, #2E7D32);
             color: white;
             border: none;
-            padding: 18px 40px;
-            border-radius: 12px;
-            font-size: 18px;
+            padding: 20px 50px;
+            border-radius: 15px;
+            font-size: 22px;
             font-weight: bold;
             cursor: pointer;
             display: block;
-            margin: 30px auto;
+            margin: 50px auto;
             transition: all 0.3s;
-        }
-        
-        .submit-btn:hover {
-            transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(76,175,80,0.3);
         }
         
-        .student-info {
-            margin: 20px 0;
-            padding: 15px;
-            background: #e3f2fd;
-            border-radius: 10px;
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(76,175,80,0.4);
         }
         
-        .student-info input {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 250px;
+        .warning-box {
+            background: #fff3cd;
+            border: 3px solid #ffc107;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 25px 0;
+            text-align: center;
             font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .formula {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: inline-block;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
-    <div class="timer" id="timer">45:00</div>
+    <div class="timer" id="timer">30:00</div>
     
     <div class="exam-container">
-        <h1 style="text-align: center; color: #1a237e;">Контрольная работа по математике</h1>
-        <p style="text-align: center; color: #666; margin-bottom: 30px;">Решите задания на бумаге, сфотографируйте и загрузите в конце</p>
+        <h1 style="text-align: center; color: #1a237e; margin-bottom: 10px;">Проверочная работа по математике</h1>
+        <p style="text-align: center; color: #666; font-size: 18px; margin-bottom: 30px;">7 класс • 30 минут</p>
+        
+        <div class="warning-box">
+            ⚠️ ВНИМАНИЕ: Не закрывайте страницу!<br>
+            Не переключайтесь на другие вкладки!<br>
+            Работа будет аннулирована при нарушении правил.
+        </div>
+        
+        <div class="student-info">
+            <h3 style="margin-top: 0; color: #0d47a1;">👨‍🎓 Ваше имя и фамилия:</h3>
+            <input type="text" id="studentName" placeholder="Введите ваше имя и фамилию" required>
+        </div>
         
         <!-- ЗАДАНИЕ 1 -->
         <div class="task">
             <div class="task-number">1</div>
-            <p><strong>Решите уравнение:</strong> 3(2x-4)-5=-2(x+1)+9</p>
+            <p><strong>Найдите 2a-4b, если a=1, b=-1.</strong></p>
+            <div class="formula">2a - 4b = ? при a=1, b=-1</div>
+            <input type="text" class="answer-input" id="answer1" placeholder="Введите ответ">
         </div>
         
         <!-- ЗАДАНИЕ 2 -->
         <div class="task">
             <div class="task-number">2</div>
-            <p><strong>Выполните действия:</strong></p>
-            <p>а) 4a²·3a³</p>
-            <p>б) (-2xy)²</p>
-            <p>в) 6m⁴:2m²</p>
-            <p>г) (5c²d⁻¹)³</p>
+            <p><strong>Раскройте скобки, приведите подобные слагаемые и найдите значение выражения при x=2</strong></p>
+            <div class="formula">7(2x-3)+6x-12</div>
+            <input type="text" class="answer-input" id="answer2" placeholder="Введите ответ">
         </div>
         
         <!-- ЗАДАНИЕ 3 -->
         <div class="task">
             <div class="task-number">3</div>
-            <p><strong>Даны промежутки:</strong> A=[1;5), B=(2;7).</p>
-            <p>А. Изобразите эти промежутки на числовой прямой.</p>
-            <p>Б. Запишите обозначение пересечения A∩B и объединения A∪B.</p>
+            <p><strong>Решите уравнение</strong></p>
+            <div class="formula">(x-7)-(2x+9) = -13</div>
+            <input type="text" class="answer-input" id="answer3" placeholder="Введите корень уравнения">
         </div>
         
-        <!-- ЗАДАНИЕ 4 с диаграммой -->
+        <!-- ЗАДАНИЕ 4 -->
         <div class="task">
             <div class="task-number">4</div>
-            <p><strong>Республика Адыгея состоит из семи районов:</strong></p>
-            
-            <div class="diagram-container">
-                <img src="control-algebra/4.png" alt="Диаграмма районов Адыгеи" class="diagram-image" 
-                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQwMCIgdmlld0JveD0iMCAwIDYwMCA0MDAiIGZpbGw9IiNmMGYwZjAiPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM2NjYiPkRpYWdyYW0gb2YgQWR5Z2VhIGRpc3RyaWN0czwvdGV4dD48L3N2Zz4='">
-                <p style="font-size: 14px; color: #666; margin-top: 10px;">
-                    Теучежский, Гиагинский, Шовгеновский, Кошехабльский,<br>
-                    Тахтамукайский, Красногвардейский, Майкопский районы
-                </p>
-            </div>
-            
-            <p>А. Определите, какой из этих районов наибольший по площади.</p>
-            <p>Б. Найдите примерную долю площади Майкопского района в общей площади районов Республики Адыгея. Ответ дайте целым числом процентов.</p>
+            <p><strong>Является ли корнем уравнения число 3?</strong></p>
+            <div class="formula">x(x-7) = -12</div>
+            <select class="answer-input" id="answer4" style="width: 200px;">
+                <option value="">Выберите ответ</option>
+                <option value="Да">Да, является</option>
+                <option value="Нет">Нет, не является</option>
+            </select>
         </div>
         
-        <!-- ЧАСТЬ B -->
-        <div style="margin: 40px 0 20px 0; padding-bottom: 10px; border-bottom: 3px solid #d32f2f;">
-            <h2 style="color: #d32f2f; margin: 0;">Часть B</h2>
-        </div>
-        
-        <!-- ЗАДАНИЕ B1 -->
+        <!-- ЗАДАНИЕ 5 -->
         <div class="task">
-            <div class="task-number">B1</div>
-            <p><strong>Рассмотрите линейную функцию y=3x-2.</strong></p>
-            <p>А. Найдите значение функции, если аргумент x=4.</p>
-            <p>Б. Найдите значение аргумента x, при котором значение функции y=7.</p>
-            <p>В. Постройте график функции на промежутке -1≤x≤3.</p>
+            <div class="task-number">5</div>
+            <p><strong>Двое рабочих изготовили 99 деталей, причем первый изготовил на 20% больше чем второй. Сколько деталей изготовил первый рабочий?</strong></p>
+            <input type="text" class="answer-input" id="answer5" placeholder="Введите количество деталей">
         </div>
         
-        <!-- ЗАДАНИЕ B2 -->
-        <div class="task">
-            <div class="task-number">B2</div>
-            <p><strong>В треугольнике ABC медиана BH делит сторону AC пополам. Известно, что ∠A=∠C. Найдите ∠ABC, если известно, что ∠A=64°.</strong></p>
-        </div>
-        
-        <!-- ИНФОРМАЦИЯ ОБ УЧЕНИКЕ -->
-        <div class="student-info">
-            <p><strong>Фамилия, имя ученика:</strong></p>
-            <input type="text" id="studentName" placeholder="Введите ваше имя и фамилию">
-        </div>
-        
-        <!-- ЗОНА ЗАГРУЗКИ ФОТО -->
-        <div class="upload-zone">
-            <h3 style="margin-top: 0; color: #2E7D32;">📸 Загрузите фото решения</h3>
-            <p>Сфотографируйте все решения на бумаге и загрузите файлы</p>
-            
-            <label class="upload-label">
-                📎 Выбрать файлы
-                <input type="file" id="fileInput" accept="image/*,.pdf" multiple>
-            </label>
-            
-            <p style="font-size: 14px; color: #666; margin-top: 10px;">
-                Можно выбрать несколько файлов (JPG, PNG, PDF)
-            </p>
-            
-            <div class="file-list" id="fileList">
-                <!-- Здесь появятся выбранные файлы -->
-            </div>
-        </div>
-        
-        <!-- КНОПКА ОТПРАВКИ -->
         <button class="submit-btn" id="submitBtn" onclick="submitWork()">
-            ✅ Отправить контрольную работу
+            ✅ Отправить проверочную работу
         </button>
         
-        <div style="text-align: center; color: #777; font-size: 14px; margin-top: 20px;">
-            <p>После отправки закройте страницу</p>
+        <div style="text-align: center; color: #777; font-size: 14px; margin-top: 30px;">
+            <p>После отправки вы можете закрыть страницу</p>
         </div>
     </div>
 
     <script>
-        // ========== СИСТЕМА ЗАЩИТЫ ==========
-
-let tabSwitchWarnings = 0;
-let lastFocusTime = Date.now();
-let isUploading = false; // Флаг загрузки файлов
-
-// 1. Умный контроль переключения вкладок
-window.addEventListener('blur', (e) => {
-    // Игнорируем потерю фокуса при клике на:
-    // - input[type="file"]
-    // - button
-    // - label (для загрузки файлов)
-    const target = e.relatedTarget || document.activeElement;
-    
-    if (target && (
-        target.tagName === 'INPUT' && target.type === 'file' ||
-        target.tagName === 'BUTTON' ||
-        target.tagName === 'LABEL' ||
-        target.closest('button') ||
-        target.closest('label')
-    )) {
-        console.log('Игнорируем потерю фокуса на элементе управления');
-        return;
-    }
-    
-    const now = Date.now();
-    // Игнорируем быстрые переключения (< 500ms)
-    if (now - lastFocusTime > 500) {
-        tabSwitchWarnings++;
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token') || 'unknown_' + Date.now();
         
-        if (tabSwitchWarnings === 1) {
-            showAlert('⚠️ Внимание! Вернитесь на страницу контрольной работы.');
-        } else if (tabSwitchWarnings === 2) {
-            showAlert('🚨 Второе предупреждение! Следующее нарушение приведет к аннулированию!');
-        } else {
-            handleViolation('multiple_tab_switching');
-            return;
-        }
-    }
-    lastFocusTime = now;
-});
-
-// 2. Запрет закрытия страницы (только если работа не отправлена)
-let workSubmitted = false;
-let blockUnload = true;
-
-window.addEventListener('beforeunload', (e) => {
-    if (blockUnload && !workSubmitted && !isUploading) {
-        e.preventDefault();
-        e.returnValue = 'Если вы закроете страницу, контрольная работа будет аннулирована. Вы уверены?';
-        return e.returnValue;
-    }
-});
-
-// 3. Защита от копирования (обновленная)
-document.addEventListener('contextmenu', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        return; // Разрешаем контекстное меню в полях ввода
-    }
-    e.preventDefault();
-    showAlert('⛔ Копирование текста запрещено!');
-    logViolation('right_click');
-});
-
-// 4. Блокировка DevTools (менее агрессивная)
-let devToolsOpened = false;
-const checkDevTools = () => {
-    const widthThreshold = 160;
-    const heightThreshold = 100;
-    
-    if (window.outerWidth - window.innerWidth > widthThreshold || 
-        window.outerHeight - window.innerHeight > heightThreshold) {
-        if (!devToolsOpened) {
-            devToolsOpened = true;
-            showAlert('⚠️ Обнаружены инструменты разработчика! Закройте их.');
-            setTimeout(() => {
-                if (devToolsOpened) {
-                    handleViolation('devtools_opened');
+        let workSubmitted = false;
+        let tabSwitchWarnings = 0;
+        let lastFocusTime = Date.now();
+        let devToolsOpened = false;
+        
+        // ========== ТАЙМЕР ==========
+        let timeLeft = 30 * 60; // 30 минут
+        const timerElement = document.getElementById('timer');
+        
+        function startTimer() {
+            setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 5 * 60 && timeLeft > 60) {
+                    timerElement.style.background = 'linear-gradient(135deg, #ff9800, #f57c00)';
                 }
-            }, 5000);
+                if (timeLeft <= 60) {
+                    timerElement.style.background = 'linear-gradient(135deg, #f44336, #d32f2f)';
+                }
+                
+                if (timeLeft <= 0 && !workSubmitted) {
+                    alert('⏰ Время вышло! Работа отправляется автоматически.');
+                    submitWork();
+                }
+            }, 1000);
         }
-    } else {
-        devToolsOpened = false;
-    }
-};
-
-setInterval(checkDevTools, 1000);
-
-// 5. Блокировка горячих клавиш (кроме необходимых)
-document.addEventListener('keydown', (e) => {
-    const blockedCombinations = [
-        { ctrl: true, key: 'c' },      // Ctrl+C
-        { ctrl: true, key: 'C' },
-        { ctrl: true, key: 'Insert' },
-        { ctrl: true, shift: true, key: 'i' }, // Ctrl+Shift+I
-        { ctrl: true, shift: true, key: 'j' }, // Ctrl+Shift+J
-        { ctrl: true, shift: true, key: 'c' }, // Ctrl+Shift+C
-        { key: 'F12' },
-        { key: 'PrintScreen' },
-    ];
-    
-    // Разрешаем Ctrl+V, Ctrl+Z, Ctrl+A в полях ввода
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        if ((e.ctrlKey || e.metaKey) && (e.key === 'v' || e.key === 'V' || e.key === 'z' || e.key === 'Z' || e.key === 'a' || e.key === 'A')) {
-            return;
-        }
-    }
-    
-    for (const combo of blockedCombinations) {
-        const ctrlMatch = combo.ctrl === undefined || combo.ctrl === e.ctrlKey;
-        const shiftMatch = combo.shift === undefined || combo.shift === e.shiftKey;
-        const keyMatch = e.key === combo.key;
         
-        if (ctrlMatch && shiftMatch && keyMatch) {
-            e.preventDefault();
-            showAlert('🚫 Это действие заблокировано!');
-            logViolation(`key_combo_${e.key}`);
-            return;
-        }
-    }
-});
-
-// ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
-
-function handleViolation(reason) {
-    clearInterval(timerInterval);
-    document.body.innerHTML = `
-        <div style="text-align:center; padding:50px; font-family:Arial;">
-            <h1 style="color:#d32f2f;">❌ РАБОТА АННУЛИРОВАНА</h1>
-            <p>Нарушение правил выполнения работы: ${reason}</p>
-            <p>Страница будет закрыта через 5 секунд...</p>
-        </div>
-    `;
-    
-    logViolation(reason);
-    
-    setTimeout(() => {
-        workSubmitted = true;
-        blockUnload = false;
-        window.close();
-    }, 5000);
-}
-
-function logViolation(reason) {
-    const violationData = {
-        token: token,
-        reason: reason,
-        timestamp: new Date().toISOString(),
-        page: window.location.href
-    };
-    
-    // Сохраняем в localStorage для отладки
-    const violations = JSON.parse(localStorage.getItem('violations') || '[]');
-    violations.push(violationData);
-    localStorage.setItem('violations', JSON.stringify(violations));
-    
-    // Отправляем на сервер
-    fetch('/log-violation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(violationData)
-    }).catch(err => console.error('Ошибка логирования:', err));
-}
-
-// ========== ФУНКЦИЯ ОТПРАВКИ РАБОТЫ (с защитой) ==========
-
-async function submitWork() {
-    if (workSubmitted) return;
-    
-    const studentName = document.getElementById('studentName').value.trim() || 'Неизвестный ученик';
-    
-    if (selectedFiles.length === 0) {
-        if (!confirm('Вы не загрузили ни одного файла. Отправить пустую работу?')) {
-            return;
-        }
-    }
-    
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true;
-    submitBtn.textContent = '📤 Отправка...';
-    isUploading = true;
-    blockUnload = false; // Разрешаем закрытие во время загрузки
-    
-    try {
-        const formData = new FormData();
-        formData.append('token', token);
-        formData.append('studentName', studentName);
+        // ========== СИСТЕМА ЗАЩИТЫ ==========
         
-        selectedFiles.forEach(file => {
-            formData.append('solutions', file);
-        });
-        
-        const response = await fetch('/upload-work', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            workSubmitted = true;
-            clearInterval(timerInterval);
+        // 1. Контроль переключения вкладок
+        window.addEventListener('blur', (e) => {
+            // Игнорируем потерю фокуса на элементах ввода
+            const target = e.relatedTarget || document.activeElement;
+            if (target && (target.tagName === 'INPUT' || target.tagName === 'SELECT')) {
+                return;
+            }
             
-            // Успешная отправка
+            const now = Date.now();
+            if (now - lastFocusTime > 500) {
+                tabSwitchWarnings++;
+                
+                if (tabSwitchWarnings === 1) {
+                    showAlert('⚠️ Внимание! Вернитесь на страницу работы.');
+                } else if (tabSwitchWarnings === 2) {
+                    showAlert('🚨 Второе предупреждение! Следующее нарушение — аннулирование!');
+                } else {
+                    handleViolation('multiple_tab_switching');
+                }
+            }
+            lastFocusTime = now;
+        });
+        
+        // 2. Запрет закрытия страницы
+        window.addEventListener('beforeunload', (e) => {
+            if (!workSubmitted) {
+                e.preventDefault();
+                e.returnValue = 'Работа не отправлена. Если закроете страницу, работа будет аннулирована.';
+                return e.returnValue;
+            }
+        });
+        
+        // 3. Защита от копирования
+        document.addEventListener('contextmenu', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+            e.preventDefault();
+            showAlert('⛔ Копирование запрещено');
+            logViolation('right_click');
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            // Разрешаем обычные клавиши в полях ввода
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
+                if ((e.ctrlKey || e.metaKey) && 
+                    (e.key === 'c' || e.key === 'C' || e.key === 'v' || e.key === 'V' || 
+                     e.key === 'x' || e.key === 'X' || e.key === 'a' || e.key === 'A' || 
+                     e.key === 'z' || e.key === 'Z')) {
+                    return;
+                }
+            }
+            
+            // Блокируем опасные комбинации
+            const blocked = [
+                { key: 'F12' },
+                { key: 'PrintScreen' },
+                { ctrlKey: true, shiftKey: true, key: 'I' },
+                { ctrlKey: true, shiftKey: true, key: 'J' },
+                { ctrlKey: true, shiftKey: true, key: 'C' }
+            ];
+            
+            for (const combo of blocked) {
+                if (e.key === combo.key && 
+                    (!combo.ctrlKey || e.ctrlKey) && 
+                    (!combo.shiftKey || e.shiftKey)) {
+                    e.preventDefault();
+                    showAlert('🚫 Это действие заблокировано');
+                    logViolation('keyboard_shortcut');
+                    return;
+                }
+            }
+        });
+        
+        // 4. Защита от DevTools
+        setInterval(() => {
+            if (window.outerWidth - window.innerWidth > 160 || 
+                window.outerHeight - window.innerHeight > 160) {
+                if (!devToolsOpened) {
+                    devToolsOpened = true;
+                    showAlert('⚠️ Обнаружены инструменты разработчика!');
+                    setTimeout(() => {
+                        if (devToolsOpened) {
+                            handleViolation('devtools_opened');
+                        }
+                    }, 3000);
+                }
+            } else {
+                devToolsOpened = false;
+            }
+        }, 1000);
+        
+        // ========== ОТПРАВКА РАБОТЫ ==========
+        async function submitWork() {
+            if (workSubmitted) return;
+            
+            const studentName = document.getElementById('studentName').value.trim();
+            if (!studentName) {
+                alert('Пожалуйста, введите ваше имя и фамилию');
+                return;
+            }
+            
+            const answers = {
+                q1: document.getElementById('answer1').value.trim(),
+                q2: document.getElementById('answer2').value.trim(),
+                q3: document.getElementById('answer3').value.trim(),
+                q4: document.getElementById('answer4').value,
+                q5: document.getElementById('answer5').value.trim()
+            };
+            
+            // Проверка пустых ответов
+            const emptyAnswers = Object.values(answers).filter(a => !a).length;
+            if (emptyAnswers > 0) {
+                if (!confirm(`Вы не ответили на ${emptyAnswers} вопросов. Отправить работу?`)) {
+                    return;
+                }
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '📤 Отправка...';
+            
+            try {
+                const response = await fetch('/submit-work', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        token: token,
+                        studentName: studentName,
+                        answers: answers
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    workSubmitted = true;
+                    submitBtn.style.background = 'linear-gradient(135deg, #2E7D32, #1B5E20)';
+                    submitBtn.textContent = '✅ Работа отправлена!';
+                    
+                    // Показываем подтверждение
+                    document.body.innerHTML = `
+                        <div style="text-align:center; padding:50px; font-family:Arial; background:#4CAF50; color:white; min-height:100vh; display:flex; flex-direction:column; justify-content:center;">
+                            <div style="background:white; color:#333; padding:40px; border-radius:20px; max-width:500px; margin:0 auto; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                                <h1 style="color:#4CAF50;">✅ Работа отправлена!</h1>
+                                <p style="font-size:18px; margin:20px 0;">Ученик: <strong>${studentName}</strong></p>
+                                <div style="background:#e8f5e9; padding:15px; border-radius:10px; margin:20px 0; text-align:left;">
+                                    <p><strong>Ваши ответы:</strong></p>
+                                    <p>1. ${answers.q1 || '—'}</p>
+                                    <p>2. ${answers.q2 || '—'}</p>
+                                    <p>3. ${answers.q3 || '—'}</p>
+                                    <p>4. ${answers.q4 || '—'}</p>
+                                    <p>5. ${answers.q5 || '—'}</p>
+                                </div>
+                                <p>Теперь вы можете закрыть эту страницу.</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Разрешаем закрытие страницы
+                    window.removeEventListener('beforeunload', arguments.callee);
+                } else {
+                    alert('Ошибка отправки: ' + (result.error || 'Попробуйте еще раз'));
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '✅ Отправить проверочную работу';
+                }
+                
+            } catch (error) {
+                alert('Ошибка соединения. Проверьте интернет и попробуйте снова.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '✅ Отправить проверочную работу';
+            }
+        }
+        
+        // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+        function showAlert(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                background: rgba(0,0,0,0.9); color: white; padding: 20px 30px; z-index: 9999;
+                border-radius: 10px; text-align: center; font-size: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            `;
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 2000);
+        }
+        
+        function handleViolation(reason) {
+            logViolation(reason);
             document.body.innerHTML = `
                 <div style="text-align:center; padding:50px; font-family:Arial;">
-                    <h1 style="color:#2E7D32;">✅ Контрольная работа отправлена!</h1>
-                    <div style="background:#e8f5e9; padding:20px; border-radius:10px; max-width:500px; margin:20px auto;">
-                        <p><strong>Ученик:</strong> ${studentName}</p>
-                        <p><strong>Загружено файлов:</strong> ${selectedFiles.length}</p>
-                        <p><strong>Статус:</strong> Принято системой</p>
-                        ${result.emailSent ? '<p>📧 Копия отправлена учителю</p>' : ''}
-                    </div>
-                    <p style="margin-top:30px; color:#666;">Вы можете закрыть эту страницу.</p>
+                    <h1 style="color:red;">❌ Работа аннулирована</h1>
+                    <p>Нарушение правил: ${reason}</p>
                 </div>
             `;
-        } else {
-            alert('Ошибка отправки: ' + (result.error || 'Неизвестная ошибка'));
-            submitBtn.disabled = false;
-            submitBtn.textContent = '✅ Отправить контрольную работу';
-            isUploading = false;
-            blockUnload = true;
         }
         
-    } catch (error) {
-        alert('Ошибка соединения с сервером. Проверьте интернет.');
-        submitBtn.disabled = false;
-        submitBtn.textContent = '✅ Отправить контрольную работу';
-        isUploading = false;
-        blockUnload = true;
-    }
-}
-
-// ========== ТАЙМЕР ==========
-
-let timeLeft = 40 * 60;
-const timerElement = document.getElementById('timer');
-let timerInterval;
-
-function startTimer() {
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        
-        // Изменяем цвет при малом оставшемся времени
-        if (timeLeft <= 5 * 60 && timeLeft > 60) {
-            timerElement.style.background = 'linear-gradient(135deg, #ff9800, #f57c00)';
-        }
-        if (timeLeft <= 60) {
-            timerElement.style.background = 'linear-gradient(135deg, #f44336, #d32f2f)';
-            timerElement.style.animation = 'pulse 1s infinite';
+        function logViolation(reason) {
+            fetch('/log-violation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token, reason: reason })
+            }).catch(() => {});
         }
         
-        timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            showAlert('⏰ Время вышло! Работа автоматически отправляется.');
-            submitWork();
-        }
-    }, 1000);
-}
-
-// ========== ЗАГРУЗКА ФАЙЛОВ ==========
-
-const fileInput = document.getElementById('fileInput');
-const fileList = document.getElementById('fileList');
-let selectedFiles = [];
-
-fileInput.addEventListener('change', function(e) {
-    const files = Array.from(e.target.files);
-    
-    // Проверка размера файлов (макс 10MB)
-    const oversized = files.filter(f => f.size > 10 * 1024 * 1024);
-    if (oversized.length > 0) {
-        alert(`Некоторые файлы слишком большие (макс 10MB):\n${oversized.map(f => f.name).join('\n')}`);
-        files = files.filter(f => f.size <= 10 * 1024 * 1024);
-    }
-    
-    selectedFiles = [...selectedFiles, ...files];
-    updateFileList();
-});
-
-function updateFileList() {
-    fileList.innerHTML = '';
-    
-    if (selectedFiles.length === 0) {
-        fileList.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">Файлы не выбраны</p>';
-        return;
-    }
-    
-    selectedFiles.forEach((file, index) => {
-        const div = document.createElement('div');
-        div.className = 'file-item';
-        div.innerHTML = `
-            <span>${file.name} (${formatBytes(file.size)})</span>
-            <button class="remove-file" onclick="removeFile(${index})" title="Удалить">×</button>
-        `;
-        fileList.appendChild(div);
-    });
-}
-
-function removeFile(index) {
-    selectedFiles.splice(index, 1);
-    updateFileList();
-}
-
-function formatBytes(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-// ========== ЗАПУСК ==========
-
-window.addEventListener('load', () => {
-    startTimer();
-    console.log('✅ Система контроля активирована');
-    
-    // Добавляем стиль для анимации
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translate(-50%, -60%); }
-            to { opacity: 1; transform: translate(-50%, -50%); }
-        }
-    `;
-    document.head.appendChild(style);
-});
+        // ========== ЗАПУСК ==========
+        window.addEventListener('load', () => {
+            startTimer();
+            console.log('✅ Проверочная работа начата, токен:', token);
+        });
     </script>
 </body>
 </html>
