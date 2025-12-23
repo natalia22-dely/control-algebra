@@ -1,16 +1,14 @@
 {
   "name": "school-exam-system",
   "version": "1.0.0",
-  "description": "Система контрольных работ с отправкой на почту",
+  "description": "Система проверочных работ с сохранением в БД",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.18.0",
-    "sqlite3": "^5.0.0",
-    "multer": "^1.4.5-lts.1",
-    "nodemailer": "^6.9.14"
+    "sqlite3": "^5.0.0"
   },
   "private": true
 }
