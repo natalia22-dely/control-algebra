@@ -1,14 +1,14 @@
 {
-  "name": "school-exam-system",
+  "name": "control-algebra",
   "version": "1.0.0",
-  "description": "Система проверочных работ с сохранением в БД",
+  "description": "Система для онлайн-контрольных работ",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.0",
-    "sqlite3": "^5.0.0"
-  },
-  "private": true
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "nodemailer": "^6.9.7"
+  }
 }
