@@ -799,12 +799,16 @@
       }
     });
 
-    // Потеря фокуса окна
+    // Потеря фокуса окна — с задержкой, чтобы клики по кнопкам не триггерили
     window.addEventListener('blur', () => {
-      if (!workSubmitted && !protectionPaused) {
-        logViolation('Потеря фокуса окна');
-        showBlocked('Вы покинули окно браузера. Попытка зафиксирована.');
-      }
+      if (workSubmitted || protectionPaused) return;
+      // Ждём 300мс — если это просто клик по кнопке на странице, фокус вернётся сам
+      setTimeout(() => {
+        if (!document.hasFocus() && !workSubmitted && !protectionPaused) {
+          logViolation('Потеря фокуса окна');
+          showBlocked('Вы покинули окно браузера. Попытка зафиксирована.');
+        }
+      }, 300);
     });
 
     // Скриншот (PrintScreen)
@@ -907,6 +911,9 @@
       return;
     }
 
+    // Отключаем защиту на время отправки
+    protectionPaused = true;
+
     const payload = {
       token,
       studentName,
@@ -922,7 +929,6 @@
         i3: document.getElementById('inter3').value,
         i4: document.getElementById('inter4').value,
         i5: document.getElementById('inter5').value,
-        i6: document.getElementById('inter6').value,
       },
       answers: {
         q1: document.getElementById('p1-answer').value,
@@ -930,7 +936,6 @@
         q3: document.getElementById('p3-answer').value,
         q4: document.getElementById('p4-answer').value,
         q5: document.getElementById('p5-answer').value,
-        q6: document.getElementById('p6-answer').value,
       },
       photos: photoData
     };
@@ -946,13 +951,14 @@
         document.getElementById('exam-screen').style.display = 'none';
         document.getElementById('success-screen').classList.add('active');
       } else {
+        protectionPaused = false;
         alert('Ошибка при отправке. Попробуйте ещё раз.');
       }
     } catch {
+      protectionPaused = false;
       alert('Нет соединения с сервером. Проверьте интернет и попробуйте снова.');
     }
   }
 </script>
 </body>
 </html>
-
