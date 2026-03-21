@@ -1,463 +1,958 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Проверочная работа по математике</title>
-    <style>
-        * {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            font-family: 'Arial', sans-serif;
-        }
-        
-        body {
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        .exam-container {
-            background: white;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        
-        .timer {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #ff416c, #ff4b2b);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 24px;
-            z-index: 1000;
-        }
-        
-        .student-info {
-            background: #e3f2fd;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            border: 2px solid #2196F3;
-        }
-        
-        .student-info input {
-            width: 300px;
-            padding: 12px;
-            border: 2px solid #2196F3;
-            border-radius: 10px;
-            font-size: 18px;
-            margin-top: 10px;
-        }
-        
-        .task {
-            margin: 30px 0;
-            padding: 25px;
-            border-left: 6px solid #4CAF50;
-            background: #f8f9fa;
-            border-radius: 0 15px 15px 0;
-            transition: transform 0.3s;
-        }
-        
-        .task:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .task-number {
-            display: inline-block;
-            background: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            font-size: 18px;
-        }
-        
-        .answer-input {
-            width: 100%;
-            max-width: 400px;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 18px;
-            margin-top: 15px;
-            transition: border 0.3s;
-        }
-        
-        .answer-input:focus {
-            border-color: #4CAF50;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
-        }
-        
-        .submit-btn {
-            background: linear-gradient(135deg, #4CAF50, #2E7D32);
-            color: white;
-            border: none;
-            padding: 20px 50px;
-            border-radius: 15px;
-            font-size: 22px;
-            font-weight: bold;
-            cursor: pointer;
-            display: block;
-            margin: 50px auto;
-            transition: all 0.3s;
-            box-shadow: 0 10px 25px rgba(76,175,80,0.3);
-        }
-        
-        .submit-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 35px rgba(76,175,80,0.4);
-        }
-        
-        .warning-box {
-            background: #fff3cd;
-            border: 3px solid #ffc107;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 25px 0;
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        
-        .formula {
-            font-family: 'Courier New', monospace;
-            background: #f5f5f5;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            display: inline-block;
-            font-size: 18px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Контрольная работа — Формулы сокращённого умножения</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #faf8f3;
+    --accent: #c0392b;
+    --gold: #b8860b;
+    --soft: #e8e4da;
+    --muted: #6b6560;
+    --correct: #27ae60;
+    --wrong: #c0392b;
+    --border: #d4cfc5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ===== ЗАБЛОКИРОВАННЫЙ ЭКРАН ===== */
+  #blocked-screen {
+    display: none;
+    position: fixed; inset: 0;
+    background: var(--ink);
+    color: #fff;
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+  }
+  #blocked-screen.active { display: flex; }
+  #blocked-screen .big-icon { font-size: 72px; margin-bottom: 20px; }
+  #blocked-screen h2 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 16px; color: #e74c3c; }
+  #blocked-screen p { font-size: 1.1rem; color: #ccc; max-width: 500px; line-height: 1.7; }
+
+  /* ===== ЭКРАН ВВОДА ИМЕНИ ===== */
+  #name-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #faf8f3 0%, #f0ece0 100%);
+  }
+  .name-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 60px 50px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+    text-align: center;
+  }
+  .name-card .subject-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .name-card h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .name-card .subtitle {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 40px;
+    font-style: italic;
+  }
+  .name-card input {
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid var(--border);
+    padding: 12px 4px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 1.1rem;
+    background: transparent;
+    color: var(--ink);
+    outline: none;
+    text-align: center;
+    transition: border-color 0.3s;
+    margin-bottom: 32px;
+  }
+  .name-card input:focus { border-color: var(--accent); }
+  .name-card input::placeholder { color: var(--border); }
+  .start-btn {
+    background: var(--ink);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.2s;
+  }
+  .start-btn:hover { background: var(--accent); }
+  .rules {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--soft);
+    text-align: left;
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+  .rules strong { color: var(--accent); }
+
+  /* ===== ОСНОВНОЙ ЭКЗАМЕН ===== */
+  #exam-screen { display: none; }
+
+  .exam-header {
+    background: var(--ink);
+    color: white;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .exam-header .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+  }
+  .exam-header .student-badge {
+    font-size: 0.85rem;
+    color: #aaa;
+    font-style: italic;
+  }
+  .progress-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.15);
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--gold);
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  .exam-content {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 50px 30px 80px;
+  }
+
+  /* ===== СЕКЦИИ ===== */
+  .section {
+    margin-bottom: 60px;
+    animation: fadeUp 0.5s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .section-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    color: var(--ink);
+  }
+  .section-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: 2px;
+  }
+
+  /* ===== ВОПРОСЫ ===== */
+  .question-block {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 28px 30px;
+    margin-bottom: 20px;
+    transition: box-shadow 0.2s;
+  }
+  .question-block:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+
+  .question-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .question-text {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: 18px;
+  }
+  .math-expr {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--accent);
+    background: var(--soft);
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 2px;
+    margin: 4px 0;
+  }
+
+  /* Тест — варианты */
+  .options-grid {
+    display: grid;
+    gap: 10px;
+  }
+  .option-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    background: white;
+    cursor: pointer;
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.95rem;
+    color: var(--ink);
+    text-align: left;
+    transition: all 0.15s;
+  }
+  .option-btn:hover:not(:disabled) { border-color: var(--ink); background: var(--soft); }
+  .option-btn .opt-letter {
+    width: 28px; height: 28px;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .option-btn.selected { border-color: var(--ink); background: var(--ink); color: white; }
+  .option-btn.correct { border-color: var(--correct); background: #eafaf1; color: var(--correct); }
+  .option-btn.wrong { border-color: var(--wrong); background: #fdf2f2; color: var(--wrong); }
+  .option-btn:disabled { cursor: default; }
+
+  .check-btn {
+    margin-top: 14px;
+    background: transparent;
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
+    padding: 9px 22px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .check-btn:hover { background: var(--ink); color: white; }
+
+  .feedback-box {
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    display: none;
+  }
+  .feedback-box.correct { background: #eafaf1; color: #1e8449; border-left: 3px solid var(--correct); }
+  .feedback-box.wrong { background: #fdf2f2; color: #922b21; border-left: 3px solid var(--wrong); }
+  .feedback-box.show { display: block; }
+
+  /* Ввод текста */
+  .answer-area {
+    width: 100%;
+    min-height: 70px;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    padding: 12px 16px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 1rem;
+    color: var(--ink);
+    background: white;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .answer-area:focus { border-color: var(--ink); }
+
+  /* Промежуточный вопрос */
+  .intermediate-block {
+    background: #fffbf0;
+    border: 1px solid #e8d5a3;
+    border-left: 3px solid var(--gold);
+    border-radius: 3px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+  .intermediate-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .intermediate-block .question-text {
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    color: #5a4a1a;
+  }
+  .intermediate-input {
+    width: 100%;
+    border: 1px solid #e8d5a3;
+    border-radius: 2px;
+    padding: 9px 12px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.95rem;
+    background: white;
+    outline: none;
+  }
+  .intermediate-input:focus { border-color: var(--gold); }
+
+  /* Фото */
+  .photo-block {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border);
+  }
+  .photo-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 10px;
+    font-style: italic;
+  }
+  .photo-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border: 1.5px dashed var(--border);
+    border-radius: 3px;
+    background: white;
+    color: var(--muted);
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .photo-upload-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .photo-upload-input { display: none; }
+  .photo-preview {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .photo-preview img {
+    width: 80px; height: 80px;
+    object-fit: cover;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+  }
+
+  /* ===== КНОПКА ОТПРАВКИ ===== */
+  .submit-section {
+    text-align: center;
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+  .submit-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 18px 56px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(192, 57, 43, 0.3);
+  }
+  .submit-btn:hover { background: #a93226; transform: translateY(-1px); }
+  .submit-note { color: var(--muted); font-size: 0.85rem; margin-top: 12px; font-style: italic; }
+
+  /* ===== ЭКРАН УСПЕХА ===== */
+  #success-screen {
+    display: none;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    background: var(--paper);
+  }
+  #success-screen.active { display: flex; }
+  .success-card {
+    text-align: center;
+    max-width: 500px;
+  }
+  .success-icon { font-size: 64px; margin-bottom: 24px; }
+  .success-card h2 { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 12px; }
+  .success-card p { color: var(--muted); font-size: 1rem; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    .exam-header { padding: 16px 20px; }
+    .exam-content { padding: 30px 16px 60px; }
+    .question-block { padding: 20px 18px; }
+    .name-card { padding: 40px 24px; }
+  }
+</style>
 </head>
 <body>
-    <div class="timer" id="timer">30:00</div>
-    
-    <div class="exam-container">
-        <h1 style="text-align: center; color: #1a237e; margin-bottom: 10px;">Проверочная работа по математике</h1>
-        <p style="text-align: center; color: #666; font-size: 18px; margin-bottom: 30px;">7 класс • 30 минут</p>
-        
-        <div class="warning-box">
-            ⚠️ ВНИМАНИЕ: Не закрывайте страницу!<br>
-            Не переключайтесь на другие вкладки!<br>
-            Работа будет аннулирована при нарушении правил.
+
+<!-- ===== ЭКРАН БЛОКИРОВКИ ===== -->
+<div id="blocked-screen">
+  <div class="big-icon">🚫</div>
+  <h2>Попытка прервана</h2>
+  <p id="blocked-reason">Вы покинули страницу контрольной работы. Попытка зафиксирована и прервана.</p>
+</div>
+
+<!-- ===== ЭКРАН ВВОДА ИМЕНИ ===== -->
+<div id="name-screen">
+  <div class="name-card">
+    <div class="subject-label">Алгебра · 7 класс</div>
+    <h1>Формулы сокращённого умножения</h1>
+    <div class="subtitle">Контрольная работа</div>
+    <input type="text" id="student-name" placeholder="Введите ваше имя и фамилию" autocomplete="off">
+    <br>
+    <button class="start-btn" onclick="startExam()">Начать работу</button>
+    <div class="rules">
+      <strong>Правила:</strong><br>
+      · Не закрывайте эту вкладку и не переключайтесь на другие<br>
+      · Не делайте снимок экрана<br>
+      · Все нарушения фиксируются автоматически<br>
+      · Работа сдаётся одним нажатием кнопки в конце
+    </div>
+  </div>
+</div>
+
+<!-- ===== ЭКЗАМЕНАЦИОННЫЙ ЭКРАН ===== -->
+<div id="exam-screen">
+  <div class="exam-header">
+    <div>
+      <div class="header-title">Формулы сокращённого умножения</div>
+      <div class="student-badge" id="header-student-name"></div>
+    </div>
+    <div style="font-size:0.8rem; color:#888;">Алгебра · 7 класс</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+
+  <div class="exam-content">
+
+    <!-- ===== ЧАСТЬ I. ТЕОРИЯ ===== -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">I</div>
+        <div>
+          <div class="section-title">Теоретическая часть</div>
+          <div class="section-desc">Выберите один правильный ответ или укажите ошибку</div>
         </div>
-        
-        <div class="student-info">
-            <h3 style="margin-top: 0; color: #0d47a1;">👨‍🎓 Ваше имя и фамилия:</h3>
-            <input type="text" id="studentName" placeholder="Введите ваше имя и фамилию" required>
+      </div>
+
+      <!-- Т1 -->
+      <div class="question-block">
+        <div class="question-label">Задание Т–1</div>
+        <div class="question-text">Определите, к какому случаю формулы сокращённого умножения относится выражение:<br>
+          <span class="math-expr">(5x + 3)²</span>
         </div>
-        
-        <!-- ЗАДАНИЕ 1 -->
-        <div class="task">
-            <div class="task-number">1</div>
-            <p><strong>Найдите 2a-4b, если a=1, b=-1.</strong></p>
-            <div class="formula">2a - 4b = ? при a=1, b=-1</div>
-            <input type="text" class="answer-input" id="answer1" placeholder="Введите ответ">
+        <div class="options-grid" id="t1-options">
+          <button class="option-btn" onclick="selectOption('t1',0,true,this)"><span class="opt-letter">А</span> Квадрат суммы двух выражений</button>
+          <button class="option-btn" onclick="selectOption('t1',1,false,this)"><span class="opt-letter">Б</span> Квадрат разности двух выражений</button>
+          <button class="option-btn" onclick="selectOption('t1',2,false,this)"><span class="opt-letter">В</span> Разность квадратов</button>
+          <button class="option-btn" onclick="selectOption('t1',3,false,this)"><span class="opt-letter">Г</span> Произведение суммы и разности</button>
         </div>
-        
-        <!-- ЗАДАНИЕ 2 -->
-        <div class="task">
-            <div class="task-number">2</div>
-            <p><strong>Раскройте скобки, приведите подобные слагаемые и найдите значение выражения при x=2</strong></p>
-            <div class="formula">7(2x-3)+6x-12</div>
-            <input type="text" class="answer-input" id="answer2" placeholder="Введите ответ">
+        <button class="check-btn" onclick="checkTheory('t1')">Проверить</button>
+        <div class="feedback-box" id="t1-feedback"></div>
+      </div>
+
+      <!-- Т2 -->
+      <div class="question-block">
+        <div class="question-label">Задание Т–2</div>
+        <div class="question-text">Определите, к какому случаю относится выражение:<br>
+          <span class="math-expr">(2a − 7b)(2a + 7b)</span>
         </div>
-        
-        <!-- ЗАДАНИЕ 3 -->
-        <div class="task">
-            <div class="task-number">3</div>
-            <p><strong>Решите уравнение</strong></p>
-            <div class="formula">(x-7)-(2x+9) = -13</div>
-            <input type="text" class="answer-input" id="answer3" placeholder="Введите корень уравнения">
+        <div class="options-grid" id="t2-options">
+          <button class="option-btn" onclick="selectOption('t2',0,false,this)"><span class="opt-letter">А</span> Квадрат суммы</button>
+          <button class="option-btn" onclick="selectOption('t2',1,false,this)"><span class="opt-letter">Б</span> Квадрат разности</button>
+          <button class="option-btn" onclick="selectOption('t2',2,false,this)"><span class="opt-letter">В</span> Разложение на множители через квадрат суммы</button>
+          <button class="option-btn" onclick="selectOption('t2',3,true,this)"><span class="opt-letter">Г</span> Произведение суммы и разности (разность квадратов)</button>
         </div>
-        
-        <!-- ЗАДАНИЕ 4 -->
-        <div class="task">
-            <div class="task-number">4</div>
-            <p><strong>Является ли корнем уравнения число 3?</strong></p>
-            <div class="formula">x(x-7) = -12</div>
-            <select class="answer-input" id="answer4" style="width: 200px;">
-                <option value="">Выберите ответ</option>
-                <option value="Да">Да, является</option>
-                <option value="Нет">Нет, не является</option>
-            </select>
+        <button class="check-btn" onclick="checkTheory('t2')">Проверить</button>
+        <div class="feedback-box" id="t2-feedback"></div>
+      </div>
+
+      <!-- Т3 — найди ошибку -->
+      <div class="question-block">
+        <div class="question-label">Задание Т–3 · Найдите ошибку</div>
+        <div class="question-text">Ученик записал раскрытие скобок. Найдите ошибку:<br>
+          <span class="math-expr">(a + 4)² = a² + 4²</span>
         </div>
-        
-        <!-- ЗАДАНИЕ 5 -->
-        <div class="task">
-            <div class="task-number">5</div>
-            <p><strong>Двое рабочих изготовили 99 деталей, причем первый изготовил на 20% больше чем второй. Сколько деталей изготовил первый рабочий?</strong></p>
-            <input type="text" class="answer-input" id="answer5" placeholder="Введите количество деталей">
+        <div class="options-grid" id="t3-options">
+          <button class="option-btn" onclick="selectOption('t3',0,false,this)"><span class="opt-letter">А</span> Ошибок нет, всё верно</button>
+          <button class="option-btn" onclick="selectOption('t3',1,true,this)"><span class="opt-letter">Б</span> Пропущено слагаемое 2·a·4 = 8a</button>
+          <button class="option-btn" onclick="selectOption('t3',2,false,this)"><span class="opt-letter">В</span> Нельзя возводить в квадрат по отдельности только второе слагаемое</button>
+          <button class="option-btn" onclick="selectOption('t3',3,false,this)"><span class="opt-letter">Г</span> Неверно, что a² + 16, должно быть 2a²</button>
         </div>
-        
-        <button class="submit-btn" id="submitBtn" onclick="submitWork()">
-            ✅ Отправить проверочную работу
-        </button>
-        
-        <div style="text-align: center; color: #777; font-size: 14px; margin-top: 30px;">
-            <p>После отправки вы можете закрыть страницу</p>
+        <button class="check-btn" onclick="checkTheory('t3')">Проверить</button>
+        <div class="feedback-box" id="t3-feedback"></div>
+      </div>
+
+      <!-- Т4 — найди ошибку -->
+      <div class="question-block">
+        <div class="question-label">Задание Т–4 · Найдите ошибку</div>
+        <div class="question-text">Ученик разложил на множители. Найдите ошибку:<br>
+          <span class="math-expr">x² − 9 = (x − 3)(x − 3)</span>
         </div>
+        <div class="options-grid" id="t4-options">
+          <button class="option-btn" onclick="selectOption('t4',0,true,this)"><span class="opt-letter">А</span> Правильно: (x − 3)(x + 3), а не (x − 3)(x − 3)</button>
+          <button class="option-btn" onclick="selectOption('t4',1,false,this)"><span class="opt-letter">Б</span> 9 нельзя представить как 3², надо как 9²</button>
+          <button class="option-btn" onclick="selectOption('t4',2,false,this)"><span class="opt-letter">В</span> Здесь нужна формула квадрата разности, а не разность квадратов</button>
+          <button class="option-btn" onclick="selectOption('t4',3,false,this)"><span class="opt-letter">Г</span> Ошибок нет</button>
+        </div>
+        <button class="check-btn" onclick="checkTheory('t4')">Проверить</button>
+        <div class="feedback-box" id="t4-feedback"></div>
+      </div>
+
+    </div><!-- /section I -->
+
+
+    <!-- ===== ЧАСТЬ II. ПРАКТИКА ===== -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-num">II</div>
+        <div>
+          <div class="section-title">Практическая часть</div>
+          <div class="section-desc">Запишите решение. При желании прикрепите фото своих записей.</div>
+        </div>
+      </div>
+
+      <!-- П1 -->
+      <div class="question-block">
+        <div class="question-label">Задание П–1 · Квадрат суммы</div>
+        <div class="question-text">Раскройте скобки, используя формулу сокращённого умножения:<br>
+          <span class="math-expr">(3x + 5)²</span>
+        </div>
+        <div class="intermediate-block">
+          <div class="intermediate-label">⭐ Промежуточный вопрос</div>
+          <div class="question-text">Как называется формула, которую вы будете применять в этом задании?</div>
+          <input class="intermediate-input" id="inter1" type="text" placeholder="Введите название формулы..." autocomplete="off">
+        </div>
+        <textarea class="answer-area" id="p1-answer" placeholder="Запишите решение..."></textarea>
+        <div class="photo-block">
+          <div class="photo-label">📎 Дополнительно: прикрепите фото ваших записей (необязательно)</div>
+          <label class="photo-upload-btn" onclick="pauseProtection()">
+            📷 Выбрать фото
+            <input type="file" class="photo-upload-input" accept="image/*" multiple onchange="handlePhoto(this,'p1-photos'); resumeProtection();">
+          </label>
+          <div class="photo-preview" id="p1-photos"></div>
+        </div>
+      </div>
+
+      <!-- П2 -->
+      <div class="question-block">
+        <div class="question-label">Задание П–2 · Квадрат разности</div>
+        <div class="question-text">Раскройте скобки:<br>
+          <span class="math-expr">(4a − 1)²</span>
+        </div>
+        <div class="intermediate-block">
+          <div class="intermediate-label">⭐ Промежуточный вопрос</div>
+          <div class="question-text">Как называется формула, которую вы будете применять в этом задании?</div>
+          <input class="intermediate-input" id="inter2" type="text" placeholder="Введите название формулы..." autocomplete="off">
+        </div>
+        <textarea class="answer-area" id="p2-answer" placeholder="Запишите решение..."></textarea>
+        <div class="photo-block">
+          <div class="photo-label">📎 Дополнительно: прикрепите фото ваших записей (необязательно)</div>
+          <label class="photo-upload-btn" onclick="pauseProtection()">
+            📷 Выбрать фото
+            <input type="file" class="photo-upload-input" accept="image/*" multiple onchange="handlePhoto(this,'p2-photos'); resumeProtection();">
+          </label>
+          <div class="photo-preview" id="p2-photos"></div>
+        </div>
+      </div>
+
+      <!-- П3 -->
+      <div class="question-block">
+        <div class="question-label">Задание П–3 · Произведение суммы и разности</div>
+        <div class="question-text">Упростите выражение:<br>
+          <span class="math-expr">(x − 3)(x + 3)</span>
+        </div>
+        <div class="intermediate-block">
+          <div class="intermediate-label">⭐ Промежуточный вопрос</div>
+          <div class="question-text">Как называется формула, которую вы будете применять в этом задании?</div>
+          <input class="intermediate-input" id="inter3" type="text" placeholder="Введите название формулы..." autocomplete="off">
+        </div>
+        <textarea class="answer-area" id="p3-answer" placeholder="Запишите решение..."></textarea>
+        <div class="photo-block">
+          <div class="photo-label">📎 Дополнительно: прикрепите фото ваших записей (необязательно)</div>
+          <label class="photo-upload-btn" onclick="pauseProtection()">
+            📷 Выбрать фото
+            <input type="file" class="photo-upload-input" accept="image/*" multiple onchange="handlePhoto(this,'p3-photos'); resumeProtection();">
+          </label>
+          <div class="photo-preview" id="p3-photos"></div>
+        </div>
+      </div>
+
+      <!-- П4 -->
+      <div class="question-block">
+        <div class="question-label">Задание П–4 · Разложение на множители</div>
+        <div class="question-text">Разложите на множители, используя формулу разности квадратов:<br>
+          <span class="math-expr">25m² − 49n²</span>
+        </div>
+        <div class="intermediate-block">
+          <div class="intermediate-label">⭐ Промежуточный вопрос</div>
+          <div class="question-text">Как называется формула, которую вы будете применять в этом задании?</div>
+          <input class="intermediate-input" id="inter4" type="text" placeholder="Введите название формулы..." autocomplete="off">
+        </div>
+        <textarea class="answer-area" id="p4-answer" placeholder="Запишите решение..."></textarea>
+        <div class="photo-block">
+          <div class="photo-label">📎 Дополнительно: прикрепите фото ваших записей (необязательно)</div>
+          <label class="photo-upload-btn" onclick="pauseProtection()">
+            📷 Выбрать фото
+            <input type="file" class="photo-upload-input" accept="image/*" multiple onchange="handlePhoto(this,'p4-photos'); resumeProtection();">
+          </label>
+          <div class="photo-preview" id="p4-photos"></div>
+        </div>
+      </div>
+
+      <!-- П5 -->
+      <div class="question-block">
+        <div class="question-label">Задание П–5 · Разложение через квадрат суммы/разности</div>
+        <div class="question-text">Разложите на множители:<br>
+          <span class="math-expr">x² − 10x + 25</span>
+        </div>
+        <div class="intermediate-block">
+          <div class="intermediate-label">⭐ Промежуточный вопрос</div>
+          <div class="question-text">Как называется формула, которую вы будете применять в этом задании?</div>
+          <input class="intermediate-input" id="inter5" type="text" placeholder="Введите название формулы..." autocomplete="off">
+        </div>
+        <textarea class="answer-area" id="p5-answer" placeholder="Запишите решение..."></textarea>
+        <div class="photo-block">
+          <div class="photo-label">📎 Дополнительно: прикрепите фото ваших записей (необязательно)</div>
+          <label class="photo-upload-btn" onclick="pauseProtection()">
+            📷 Выбрать фото
+            <input type="file" class="photo-upload-input" accept="image/*" multiple onchange="handlePhoto(this,'p5-photos'); resumeProtection();">
+          </label>
+          <div class="photo-preview" id="p5-photos"></div>
+        </div>
+      </div>
+
+      <!-- П6 -->
+      <div class="question-block">
+        <div class="question-label">Задание П–6 · Смешанная практика</div>
+        <div class="question-text">Выполните все примеры. Решения запишите в тетрадь и прикрепите фото в конце.</div>
+
+        <div style="display:grid; gap:10px; margin: 18px 0;">
+          <div style="background:var(--soft); border-radius:3px; padding:12px 16px; display:flex; align-items:center; gap:16px;">
+            <span style="font-family:'Playfair Display',serif; color:var(--muted); font-size:0.85rem; min-width:28px;">1.</span>
+            <span class="math-expr" style="margin:0;">(a + 6)²</span>
+          </div>
+          <div style="background:var(--soft); border-radius:3px; padding:12px 16px; display:flex; align-items:center; gap:16px;">
+            <span style="font-family:'Playfair Display',serif; color:var(--muted); font-size:0.85rem; min-width:28px;">2.</span>
+            <span class="math-expr" style="margin:0;">(3b − 2)²</span>
+          </div>
+          <div style="background:var(--soft); border-radius:3px; padding:12px 16px; display:flex; align-items:center; gap:16px;">
+            <span style="font-family:'Playfair Display',serif; color:var(--muted); font-size:0.85rem; min-width:28px;">3.</span>
+            <span class="math-expr" style="margin:0;">(5x + y)(5x − y)</span>
+          </div>
+          <div style="background:var(--soft); border-radius:3px; padding:12px 16px; display:flex; align-items:center; gap:16px;">
+            <span style="font-family:'Playfair Display',serif; color:var(--muted); font-size:0.85rem; min-width:28px;">4.</span>
+            <span class="math-expr" style="margin:0;">4a² − 1</span>
+            <span style="font-size:0.8rem; color:var(--muted); font-style:italic;">разложить на множители</span>
+          </div>
+          <div style="background:var(--soft); border-radius:3px; padding:12px 16px; display:flex; align-items:center; gap:16px;">
+            <span style="font-family:'Playfair Display',serif; color:var(--muted); font-size:0.85rem; min-width:28px;">5.</span>
+            <span class="math-expr" style="margin:0;">a² + 14a + 49</span>
+            <span style="font-size:0.8rem; color:var(--muted); font-style:italic;">разложить на множители</span>
+          </div>
+          <div style="background:var(--soft); border-radius:3px; padding:12px 16px; display:flex; align-items:center; gap:16px;">
+            <span style="font-family:'Playfair Display',serif; color:var(--muted); font-size:0.85rem; min-width:28px;">6.</span>
+            <span class="math-expr" style="margin:0;">(2m + 5n)²</span>
+          </div>
+          <div style="background:var(--soft); border-radius:3px; padding:12px 16px; display:flex; align-items:center; gap:16px;">
+            <span style="font-family:'Playfair Display',serif; color:var(--muted); font-size:0.85rem; min-width:28px;">7.</span>
+            <span class="math-expr" style="margin:0;">9x² − 12x + 4</span>
+            <span style="font-size:0.8rem; color:var(--muted); font-style:italic;">разложить на множители</span>
+          </div>
+          <div style="background:var(--soft); border-radius:3px; padding:12px 16px; display:flex; align-items:center; gap:16px;">
+            <span style="font-family:'Playfair Display',serif; color:var(--muted); font-size:0.85rem; min-width:28px;">8.</span>
+            <span class="math-expr" style="margin:0;">(7 − k)(7 + k)</span>
+          </div>
+          <div style="background:var(--soft); border-radius:3px; padding:12px 16px; display:flex; align-items:center; gap:16px;">
+            <span style="font-family:'Playfair Display',serif; color:var(--muted); font-size:0.85rem; min-width:28px;">9.</span>
+            <span class="math-expr" style="margin:0;">36b² − 25c²</span>
+            <span style="font-size:0.8rem; color:var(--muted); font-style:italic;">разложить на множители</span>
+          </div>
+          <div style="background:var(--soft); border-radius:3px; padding:12px 16px; display:flex; align-items:center; gap:16px;">
+            <span style="font-family:'Playfair Display',serif; color:var(--muted); font-size:0.85rem; min-width:28px;">10.</span>
+            <span class="math-expr" style="margin:0;">(x − 4)²</span>
+          </div>
+        </div>
+
+        <div class="photo-block" style="border-top: 1px solid var(--border); padding-top: 18px; margin-top: 4px;">
+          <div class="photo-label" style="font-size:0.9rem; color: var(--ink); font-style:normal; margin-bottom:12px;">📷 Прикрепите фото ваших решений из тетради</div>
+          <label class="photo-upload-btn" onclick="pauseProtection()" >
+            Выбрать фото
+            <input type="file" class="photo-upload-input" accept="image/*" multiple onchange="handlePhoto(this,'p6-photos'); resumeProtection();">
+          </label>
+          <div class="photo-preview" id="p6-photos"></div>
+        </div>
+      </div>
+
+    </div><!-- /section II -->
+
+    <!-- ОТПРАВКА -->
+    <div class="submit-section">
+      <button class="submit-btn" onclick="submitWork()">Сдать работу</button>
+      <div class="submit-note">После нажатия работа будет отправлена учителю</div>
     </div>
 
-    <script>
-        // ========== ИНИЦИАЛИЗАЦИЯ ==========
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token') || 'unknown_' + Date.now();
-        
-        let workSubmitted = false;
-        let tabSwitchWarnings = 0;
-        let lastFocusTime = Date.now();
-        let devToolsOpened = false;
-        
-        // ========== ТАЙМЕР ==========
-        let timeLeft = 30 * 60; // 30 минут
-        const timerElement = document.getElementById('timer');
-        
-        function startTimer() {
-            setInterval(() => {
-                timeLeft--;
-                const minutes = Math.floor(timeLeft / 60);
-                const seconds = timeLeft % 60;
-                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                
-                if (timeLeft <= 5 * 60 && timeLeft > 60) {
-                    timerElement.style.background = 'linear-gradient(135deg, #ff9800, #f57c00)';
-                }
-                if (timeLeft <= 60) {
-                    timerElement.style.background = 'linear-gradient(135deg, #f44336, #d32f2f)';
-                }
-                
-                if (timeLeft <= 0 && !workSubmitted) {
-                    alert('⏰ Время вышло! Работа отправляется автоматически.');
-                    submitWork();
-                }
-            }, 1000);
-        }
-        
-        // ========== СИСТЕМА ЗАЩИТЫ ==========
-        
-        // 1. Контроль переключения вкладок
-        window.addEventListener('blur', (e) => {
-            // Игнорируем потерю фокуса на элементах ввода
-            const target = e.relatedTarget || document.activeElement;
-            if (target && (target.tagName === 'INPUT' || target.tagName === 'SELECT')) {
-                return;
-            }
-            
-            const now = Date.now();
-            if (now - lastFocusTime > 500) {
-                tabSwitchWarnings++;
-                
-                if (tabSwitchWarnings === 1) {
-                    showAlert('⚠️ Внимание! Вернитесь на страницу работы.');
-                } else if (tabSwitchWarnings === 2) {
-                    showAlert('🚨 Второе предупреждение! Следующее нарушение — аннулирование!');
-                } else {
-                    handleViolation('multiple_tab_switching');
-                }
-            }
-            lastFocusTime = now;
-        });
-        
-        // 2. Запрет закрытия страницы
-        window.addEventListener('beforeunload', (e) => {
-            if (!workSubmitted) {
-                e.preventDefault();
-                e.returnValue = 'Работа не отправлена. Если закроете страницу, работа будет аннулирована.';
-                return e.returnValue;
-            }
-        });
-        
-        // 3. Защита от копирования
-        document.addEventListener('contextmenu', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-            e.preventDefault();
-            showAlert('⛔ Копирование запрещено');
-            logViolation('right_click');
-        });
-        
-        document.addEventListener('keydown', (e) => {
-            // Разрешаем обычные клавиши в полях ввода
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
-                if ((e.ctrlKey || e.metaKey) && 
-                    (e.key === 'c' || e.key === 'C' || e.key === 'v' || e.key === 'V' || 
-                     e.key === 'x' || e.key === 'X' || e.key === 'a' || e.key === 'A' || 
-                     e.key === 'z' || e.key === 'Z')) {
-                    return;
-                }
-            }
-            
-            // Блокируем опасные комбинации
-            const blocked = [
-                { key: 'F12' },
-                { key: 'PrintScreen' },
-                { ctrlKey: true, shiftKey: true, key: 'I' },
-                { ctrlKey: true, shiftKey: true, key: 'J' },
-                { ctrlKey: true, shiftKey: true, key: 'C' }
-            ];
-            
-            for (const combo of blocked) {
-                if (e.key === combo.key && 
-                    (!combo.ctrlKey || e.ctrlKey) && 
-                    (!combo.shiftKey || e.shiftKey)) {
-                    e.preventDefault();
-                    showAlert('🚫 Это действие заблокировано');
-                    logViolation('keyboard_shortcut');
-                    return;
-                }
-            }
-        });
-        
-        // 4. Защита от DevTools
-        setInterval(() => {
-            if (window.outerWidth - window.innerWidth > 160 || 
-                window.outerHeight - window.innerHeight > 160) {
-                if (!devToolsOpened) {
-                    devToolsOpened = true;
-                    showAlert('⚠️ Обнаружены инструменты разработчика!');
-                    setTimeout(() => {
-                        if (devToolsOpened) {
-                            handleViolation('devtools_opened');
-                        }
-                    }, 3000);
-                }
-            } else {
-                devToolsOpened = false;
-            }
-        }, 1000);
-        
-        // ========== ОТПРАВКА РАБОТЫ ==========
-        async function submitWork() {
-            if (workSubmitted) return;
-            
-            const studentName = document.getElementById('studentName').value.trim();
-            if (!studentName) {
-                alert('Пожалуйста, введите ваше имя и фамилию');
-                return;
-            }
-            
-            const answers = {
-                q1: document.getElementById('answer1').value.trim(),
-                q2: document.getElementById('answer2').value.trim(),
-                q3: document.getElementById('answer3').value.trim(),
-                q4: document.getElementById('answer4').value,
-                q5: document.getElementById('answer5').value.trim()
-            };
-            
-            // Проверка пустых ответов
-            const emptyAnswers = Object.values(answers).filter(a => !a).length;
-            if (emptyAnswers > 0) {
-                if (!confirm(`Вы не ответили на ${emptyAnswers} вопросов. Отправить работу?`)) {
-                    return;
-                }
-            }
-            
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = '📤 Отправка...';
-            
-            try {
-                const response = await fetch('/submit-work', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        token: token,
-                        studentName: studentName,
-                        answers: answers
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    workSubmitted = true;
-                    submitBtn.style.background = 'linear-gradient(135deg, #2E7D32, #1B5E20)';
-                    submitBtn.textContent = '✅ Работа отправлена!';
-                    
-                    // Показываем подтверждение
-                    document.body.innerHTML = `
-                        <div style="text-align:center; padding:50px; font-family:Arial; background:#4CAF50; color:white; min-height:100vh; display:flex; flex-direction:column; justify-content:center;">
-                            <div style="background:white; color:#333; padding:40px; border-radius:20px; max-width:500px; margin:0 auto; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-                                <h1 style="color:#4CAF50;">✅ Работа отправлена!</h1>
-                                <p style="font-size:18px; margin:20px 0;">Ученик: <strong>${studentName}</strong></p>
-                                <div style="background:#e8f5e9; padding:15px; border-radius:10px; margin:20px 0; text-align:left;">
-                                    <p><strong>Ваши ответы:</strong></p>
-                                    <p>1. ${answers.q1 || '—'}</p>
-                                    <p>2. ${answers.q2 || '—'}</p>
-                                    <p>3. ${answers.q3 || '—'}</p>
-                                    <p>4. ${answers.q4 || '—'}</p>
-                                    <p>5. ${answers.q5 || '—'}</p>
-                                </div>
-                                <p>Теперь вы можете закрыть эту страницу.</p>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // Разрешаем закрытие страницы
-                    window.removeEventListener('beforeunload', arguments.callee);
-                } else {
-                    alert('Ошибка отправки: ' + (result.error || 'Попробуйте еще раз'));
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '✅ Отправить проверочную работу';
-                }
-                
-            } catch (error) {
-                alert('Ошибка соединения. Проверьте интернет и попробуйте снова.');
-                submitBtn.disabled = false;
-                submitBtn.textContent = '✅ Отправить проверочную работу';
-            }
-        }
-        
-        // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
-        function showAlert(message) {
-            const alertDiv = document.createElement('div');
-            alertDiv.style.cssText = `
-                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                background: rgba(0,0,0,0.9); color: white; padding: 20px 30px; z-index: 9999;
-                border-radius: 10px; text-align: center; font-size: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            `;
-            alertDiv.textContent = message;
-            document.body.appendChild(alertDiv);
-            setTimeout(() => alertDiv.remove(), 2000);
-        }
-        
-        function handleViolation(reason) {
-            logViolation(reason);
-            document.body.innerHTML = `
-                <div style="text-align:center; padding:50px; font-family:Arial;">
-                    <h1 style="color:red;">❌ Работа аннулирована</h1>
-                    <p>Нарушение правил: ${reason}</p>
-                </div>
-            `;
-        }
-        
-        function logViolation(reason) {
-            fetch('/log-violation', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token: token, reason: reason })
-            }).catch(() => {});
-        }
-        
-        // ========== ЗАПУСК ==========
-        window.addEventListener('load', () => {
-            startTimer();
-            console.log('✅ Проверочная работа начата, токен:', token);
-        });
-    </script>
+  </div><!-- /exam-content -->
+</div><!-- /exam-screen -->
+
+<!-- ===== ЭКРАН УСПЕХА ===== -->
+<div id="success-screen">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <h2>Работа сдана!</h2>
+    <p>Ваша контрольная работа успешно отправлена.<br>Можете закрыть эту страницу.</p>
+  </div>
+</div>
+
+<script>
+  let studentName = '';
+  let token = window.location.pathname.split('/').pop();
+  let isBlocked = false;
+  let workSubmitted = false;
+  let theoryAnswered = {};
+  let photoData = {};
+  let protectionPaused = false;
+
+  function pauseProtection() {
+    protectionPaused = true;
+    setTimeout(() => { protectionPaused = false; }, 30000);
+  }
+  function resumeProtection() {
+    setTimeout(() => { protectionPaused = false; }, 1000);
+  }
+
+  // ===== ИМЯ И СТАРТ =====
+  function startExam() {
+    const nameInput = document.getElementById('student-name').value.trim();
+    if (!nameInput) {
+      alert('Пожалуйста, введите ваше имя');
+      return;
+    }
+    studentName = nameInput;
+    document.getElementById('name-screen').style.display = 'none';
+    document.getElementById('exam-screen').style.display = 'block';
+    document.getElementById('header-student-name').textContent = studentName;
+    setupAntiCheat();
+    updateProgress();
+  }
+
+  // ===== АНТИШПАРГАЛКА =====
+  function setupAntiCheat() {
+    // Уход с вкладки
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && !workSubmitted && !protectionPaused) {
+        logViolation('Уход с вкладки / переключение');
+        showBlocked('Вы переключились на другую вкладку или свернули браузер. Попытка зафиксирована.');
+      }
+    });
+
+    // Потеря фокуса окна
+    window.addEventListener('blur', () => {
+      if (!workSubmitted && !protectionPaused) {
+        logViolation('Потеря фокуса окна');
+        showBlocked('Вы покинули окно браузера. Попытка зафиксирована.');
+      }
+    });
+
+    // Скриншот (PrintScreen)
+    document.addEventListener('keydown', (e) => {
+      if (!workSubmitted && (e.key === 'PrintScreen' || (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === '4' || e.key === '3')))) {
+        logViolation('Попытка снимка экрана');
+        showBlocked('Зафиксирована попытка сделать снимок экрана.');
+      }
+    });
+
+    // Правая кнопка мыши
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+  }
+
+  function showBlocked(reason) {
+    isBlocked = true;
+    document.getElementById('blocked-reason').textContent = reason;
+    document.getElementById('blocked-screen').classList.add('active');
+  }
+
+  function logViolation(reason) {
+    fetch('/log-violation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, reason, student: studentName })
+    }).catch(() => {});
+  }
+
+  // ===== ТЕОРИЯ =====
+  function selectOption(questionId, optionIdx, isCorrect, btn) {
+    if (theoryAnswered[questionId]) return;
+    const btns = document.querySelectorAll(`#${questionId}-options .option-btn`);
+    btns.forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    btn.dataset.selected = 'true';
+    btn.dataset.correct = isCorrect;
+  }
+
+  const theoryFeedback = {
+    t1: { correct: 'Верно! (5x + 3)² — это квадрат суммы: (a + b)² = a² + 2ab + b².', wrong: 'Неверно. Обратите внимание: оба выражения складываются и возводятся в квадрат — это формула квадрата суммы.' },
+    t2: { correct: 'Верно! (2a − 7b)(2a + 7b) — это произведение суммы и разности одних и тех же выражений.', wrong: 'Неверно. Здесь два одинаковых выражения (2a и 7b), но одно берётся с минусом, другое с плюсом — это произведение суммы и разности.' },
+    t3: { correct: 'Верно! Правильно: (a + 4)² = a² + 2·a·4 + 16 = a² + 8a + 16. Среднее слагаемое пропущено.', wrong: 'Неверно. По формуле квадрата суммы (a + b)² = a² + 2ab + b². Здесь пропущено слагаемое 2·a·4 = 8a.' },
+    t4: { correct: 'Верно! x² − 9 = (x − 3)(x + 3). Формула разности квадратов: a² − b² = (a − b)(a + b).', wrong: 'Неверно. Формула разности квадратов: a² − b² = (a − b)(a + b). Один множитель с минусом, другой с плюсом.' }
+  };
+
+  function checkTheory(qId) {
+    if (theoryAnswered[qId]) return;
+    const selected = document.querySelector(`#${qId}-options .option-btn[data-selected="true"]`);
+    if (!selected) { alert('Выберите вариант ответа'); return; }
+    const isCorrect = selected.dataset.correct === 'true';
+    const feedbackEl = document.getElementById(`${qId}-feedback`);
+
+    const allBtns = document.querySelectorAll(`#${qId}-options .option-btn`);
+    allBtns.forEach(b => {
+      b.disabled = true;
+      if (b.dataset.correct === 'true') b.classList.add('correct');
+    });
+    if (!isCorrect) selected.classList.add('wrong');
+
+    feedbackEl.textContent = isCorrect ? '✓ ' + theoryFeedback[qId].correct : '✗ ' + theoryFeedback[qId].wrong;
+    feedbackEl.className = 'feedback-box show ' + (isCorrect ? 'correct' : 'wrong');
+    theoryAnswered[qId] = true;
+    updateProgress();
+  }
+
+  // ===== ФОТО =====
+  function handlePhoto(input, previewId) {
+    const preview = document.getElementById(previewId);
+    if (!photoData[previewId]) photoData[previewId] = [];
+    Array.from(input.files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        photoData[previewId].push(e.target.result);
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        preview.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ===== ПРОГРЕСС =====
+  function updateProgress() {
+    const answered = Object.keys(theoryAnswered).length;
+    const pct = Math.round((answered / 4) * 40); // 40% за теорию
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+
+  // ===== ОТПРАВКА =====
+  async function submitWork() {
+    if (workSubmitted) return;
+
+    const p1 = document.getElementById('p1-answer').value.trim();
+    const p2 = document.getElementById('p2-answer').value.trim();
+    const p3 = document.getElementById('p3-answer').value.trim();
+    if (!p1 && !p2 && !p3) {
+      alert('Пожалуйста, заполните хотя бы несколько практических заданий перед отправкой.');
+      return;
+    }
+
+    const payload = {
+      token,
+      studentName,
+      theory: {
+        t1: theoryAnswered.t1 || false,
+        t2: theoryAnswered.t2 || false,
+        t3: theoryAnswered.t3 || false,
+        t4: theoryAnswered.t4 || false,
+      },
+      intermediate: {
+        i1: document.getElementById('inter1').value,
+        i2: document.getElementById('inter2').value,
+        i3: document.getElementById('inter3').value,
+        i4: document.getElementById('inter4').value,
+        i5: document.getElementById('inter5').value,
+        i6: document.getElementById('inter6').value,
+      },
+      answers: {
+        q1: document.getElementById('p1-answer').value,
+        q2: document.getElementById('p2-answer').value,
+        q3: document.getElementById('p3-answer').value,
+        q4: document.getElementById('p4-answer').value,
+        q5: document.getElementById('p5-answer').value,
+        q6: document.getElementById('p6-answer').value,
+      },
+      photos: photoData
+    };
+
+    try {
+      const res = await fetch('/submit-work', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        workSubmitted = true;
+        document.getElementById('exam-screen').style.display = 'none';
+        document.getElementById('success-screen').classList.add('active');
+      } else {
+        alert('Ошибка при отправке. Попробуйте ещё раз.');
+      }
+    } catch {
+      alert('Нет соединения с сервером. Проверьте интернет и попробуйте снова.');
+    }
+  }
+</script>
 </body>
 </html>
+
