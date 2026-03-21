@@ -2,7 +2,7 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const crypto = require('crypto');
 const path = require('path');
-const fs = require('fs');
+const nodemailer = require('nodemailer');
 
 const app = express();
 
@@ -10,60 +10,166 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.static('public'));
 
-// База данных
-const db = new sqlite3.Database(':memory:');
+// ===== ПОЧТА =====
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'nataliafreze22@gmail.com',
+    pass: 'hssx xzov rypm dgox'
+  }
+});
+
+// ===== БАЗА ДАННЫХ (файл на диске) =====
+const DB_PATH = path.join(__dirname, 'data', 'works.db');
+const dataDir = path.join(__dirname, 'data');
+if (!require('fs').existsSync(dataDir)) {
+  require('fs').mkdirSync(dataDir, { recursive: true });
+}
+
+const db = new sqlite3.Database(DB_PATH, (err) => {
+  if (err) console.error('Ошибка открытия БД:', err);
+  else console.log('✅ База данных подключена:', DB_PATH);
+});
 
 db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS links (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    token TEXT UNIQUE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    usage_count INTEGER DEFAULT 0
+  )`);
 
-  db.run(`
-    CREATE TABLE IF NOT EXISTS links (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      token TEXT UNIQUE,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      usage_count INTEGER DEFAULT 0
-    )
-  `);
+  db.run(`CREATE TABLE IF NOT EXISTS works (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    token TEXT,
+    student_name TEXT,
+    theory_t1 INTEGER DEFAULT 0,
+    theory_t2 INTEGER DEFAULT 0,
+    theory_t3 INTEGER DEFAULT 0,
+    theory_t4 INTEGER DEFAULT 0,
+    inter1 TEXT,
+    inter2 TEXT,
+    inter3 TEXT,
+    inter4 TEXT,
+    inter5 TEXT,
+    question1 TEXT,
+    question2 TEXT,
+    question3 TEXT,
+    question4 TEXT,
+    question5 TEXT,
+    photos_p1 TEXT,
+    photos_p2 TEXT,
+    photos_p3 TEXT,
+    photos_p4 TEXT,
+    photos_p5 TEXT,
+    photos_p6 TEXT,
+    submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
 
-  db.run(`
-    CREATE TABLE IF NOT EXISTS works (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      token TEXT,
-      student_name TEXT,
-      theory_t1 INTEGER DEFAULT 0,
-      theory_t2 INTEGER DEFAULT 0,
-      theory_t3 INTEGER DEFAULT 0,
-      theory_t4 INTEGER DEFAULT 0,
-      inter1 TEXT,
-      inter2 TEXT,
-      inter3 TEXT,
-      inter4 TEXT,
-      inter5 TEXT,
-      question1 TEXT,
-      question2 TEXT,
-      question3 TEXT,
-      question4 TEXT,
-      question5 TEXT,
-      photos_p1 TEXT,
-      photos_p2 TEXT,
-      photos_p3 TEXT,
-      photos_p4 TEXT,
-      photos_p5 TEXT,
-      photos_p6 TEXT,
-      submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  db.run(`
-    CREATE TABLE IF NOT EXISTS violations (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      token TEXT,
-      student TEXT,
-      reason TEXT,
-      violation_time DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
+  db.run(`CREATE TABLE IF NOT EXISTS violations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    token TEXT,
+    student TEXT,
+    reason TEXT,
+    violation_time DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
 });
+
+// ===== ОТПРАВКА EMAIL =====
+async function sendResultEmail(studentName, theory, intermediate, answers, photos) {
+  const theoryScore = [theory?.t1, theory?.t2, theory?.t3, theory?.t4].filter(Boolean).length;
+
+  // Фото П6 — прикрепляем как вложения
+  let attachments = [];
+  let p6photos = (photos && photos['p6-photos']) || [];
+  p6photos.forEach((base64, i) => {
+    const matches = base64.match(/^data:(.+);base64,(.+)$/);
+    if (matches) {
+      attachments.push({
+        filename: `foto_p6_${i + 1}.jpg`,
+        content: matches[2],
+        encoding: 'base64',
+        contentType: matches[1]
+      });
+    }
+  });
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 700px;">
+      <h2 style="color:#1a1a2e;">📋 Новая работа сдана</h2>
+      <p><strong>Ученик:</strong> ${studentName}</p>
+      <p><strong>Время:</strong> ${new Date().toLocaleString('ru-RU')}</p>
+      <p><strong>Тема:</strong> Формулы сокращённого умножения · 7 класс</p>
+
+      <hr style="margin: 20px 0;">
+
+      <h3>Часть I — Теория (${theoryScore}/4)</h3>
+      <table style="border-collapse:collapse; width:100%;">
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Задание</th>
+          <th style="padding:8px; border:1px solid #ddd;">Результат</th>
+        </tr>
+        <tr><td style="padding:8px; border:1px solid #ddd;">Т–1: Определить формулу для (5x+3)²</td>
+            <td style="padding:8px; border:1px solid #ddd;">${theory?.t1 ? '✅ Верно' : '❌ Неверно'}</td></tr>
+        <tr><td style="padding:8px; border:1px solid #ddd;">Т–2: Определить формулу для (2a−7b)(2a+7b)</td>
+            <td style="padding:8px; border:1px solid #ddd;">${theory?.t2 ? '✅ Верно' : '❌ Неверно'}</td></tr>
+        <tr><td style="padding:8px; border:1px solid #ddd;">Т–3: Найти ошибку в (a+4)²=a²+4²</td>
+            <td style="padding:8px; border:1px solid #ddd;">${theory?.t3 ? '✅ Верно' : '❌ Неверно'}</td></tr>
+        <tr><td style="padding:8px; border:1px solid #ddd;">Т–4: Найти ошибку в x²−9=(x−3)(x−3)</td>
+            <td style="padding:8px; border:1px solid #ddd;">${theory?.t4 ? '✅ Верно' : '❌ Неверно'}</td></tr>
+      </table>
+
+      <h3 style="margin-top:24px;">Часть II — Практика</h3>
+      <table style="border-collapse:collapse; width:100%;">
+        <tr style="background:#f0f0f0;">
+          <th style="padding:8px; border:1px solid #ddd;">Задание</th>
+          <th style="padding:8px; border:1px solid #ddd;">Назвал формулу</th>
+          <th style="padding:8px; border:1px solid #ddd;">Решение</th>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>П–1</strong> (3x+5)²</td>
+          <td style="padding:8px; border:1px solid #ddd;">${intermediate?.i1 || '—'}</td>
+          <td style="padding:8px; border:1px solid #ddd;">${answers?.q1 || '—'}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>П–2</strong> (4a−1)²</td>
+          <td style="padding:8px; border:1px solid #ddd;">${intermediate?.i2 || '—'}</td>
+          <td style="padding:8px; border:1px solid #ddd;">${answers?.q2 || '—'}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>П–3</strong> (x−3)(x+3)</td>
+          <td style="padding:8px; border:1px solid #ddd;">${intermediate?.i3 || '—'}</td>
+          <td style="padding:8px; border:1px solid #ddd;">${answers?.q3 || '—'}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>П–4</strong> 25m²−49n²</td>
+          <td style="padding:8px; border:1px solid #ddd;">${intermediate?.i4 || '—'}</td>
+          <td style="padding:8px; border:1px solid #ddd;">${answers?.q4 || '—'}</td>
+        </tr>
+        <tr>
+          <td style="padding:8px; border:1px solid #ddd;"><strong>П–5</strong> x²−10x+25</td>
+          <td style="padding:8px; border:1px solid #ddd;">${intermediate?.i5 || '—'}</td>
+          <td style="padding:8px; border:1px solid #ddd;">${answers?.q5 || '—'}</td>
+        </tr>
+      </table>
+
+      <p style="margin-top:16px;"><strong>П–6 (10 примеров):</strong> ${p6photos.length > 0 ? `фото прикреплено (${p6photos.length} шт.)` : 'фото не прикреплено'}</p>
+
+      <hr style="margin: 20px 0;">
+      <p style="color:#888; font-size:12px;">Письмо отправлено автоматически системой проверочных работ.</p>
+    </div>
+  `;
+
+  await transporter.sendMail({
+    from: '"Система работ" <nataliafreze22@gmail.com>',
+    to: 'nataliafreze22@gmail.com',
+    subject: `📋 Работа сдана: ${studentName} — Формулы сокращённого умножения`,
+    html,
+    attachments
+  });
+}
+
+// ==================== МАРШРУТЫ ====================
 
 app.get('/', (req, res) => {
   res.send(`<!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -102,11 +208,10 @@ app.get('/admin/generate', (req, res) => {
 app.get('/exam/:token', (req, res) => {
   const token = req.params.token;
   db.run('UPDATE links SET usage_count = usage_count + 1 WHERE token = ?', [token]);
-  console.log(`📝 Открытие работы: ${token}`);
   res.sendFile(path.join(__dirname, 'protected.html'));
 });
 
-app.post('/submit-work', (req, res) => {
+app.post('/submit-work', async (req, res) => {
   const { token, studentName, theory, intermediate, answers, photos } = req.body;
   console.log(`📝 Сохранение работы от: ${studentName}`);
 
@@ -117,6 +222,7 @@ app.post('/submit-work', (req, res) => {
   const photosP5 = JSON.stringify((photos && photos['p5-photos']) || []);
   const photosP6 = JSON.stringify((photos && photos['p6-photos']) || []);
 
+  // Сохраняем в БД
   db.run(
     `INSERT INTO works (
       token, student_name,
@@ -134,8 +240,20 @@ app.post('/submit-work', (req, res) => {
       answers?.q4 || '', answers?.q5 || '',
       photosP1, photosP2, photosP3, photosP4, photosP5, photosP6
     ],
-    function(err) {
-      if (err) { console.error('Ошибка:', err); return res.status(500).json({ error: 'Ошибка сохранения' }); }
+    async function(err) {
+      if (err) {
+        console.error('Ошибка сохранения в БД:', err);
+        return res.status(500).json({ error: 'Ошибка сохранения' });
+      }
+
+      // Отправляем email (не блокируем ответ)
+      try {
+        await sendResultEmail(studentName, theory, intermediate, answers, photos);
+        console.log(`📧 Письмо отправлено для: ${studentName}`);
+      } catch (mailErr) {
+        console.error('Ошибка отправки письма:', mailErr.message);
+      }
+
       res.json({ success: true, workId: this.lastID });
     }
   );
@@ -172,7 +290,7 @@ app.get('/admin/results', (req, res) => {
         html += `<tr>
           <td style="font-family:monospace;font-size:12px;">${g.token.substring(0,12)}...</td>
           <td><strong>${g.student_count}</strong></td>
-          <td>${g.students || '—'}</td>
+          <td>${g.students||'—'}</td>
           <td>${new Date(g.last_submission).toLocaleString('ru-RU')}</td>
           <td><button class="btn" onclick="showDetails('${g.token}')">📄 Показать</button></td>
         </tr>
