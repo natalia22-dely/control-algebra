@@ -219,7 +219,7 @@ app.get('/exam/:token', (req, res) => {
         </div></body></html>`);
     }
 
-    if (link.usage_count >= 1) {
+    if (link.usage_count >= 2) {
       return res.status(403).send(`<!DOCTYPE html><html><head><meta charset="UTF-8">
         <style>body{font-family:Arial;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f5f5f5;}
         .card{background:white;padding:40px;border-radius:12px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.1);max-width:480px;}
