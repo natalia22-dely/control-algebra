@@ -207,8 +207,32 @@ app.get('/admin/generate', (req, res) => {
 
 app.get('/exam/:token', (req, res) => {
   const token = req.params.token;
-  db.run('UPDATE links SET usage_count = usage_count + 1 WHERE token = ?', [token]);
-  res.sendFile(path.join(__dirname, 'protected.html'));
+
+  db.get('SELECT * FROM links WHERE token = ?', [token], (err, link) => {
+    if (err || !link) {
+      return res.status(404).send(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+        <style>body{font-family:Arial;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f5f5f5;}
+        .card{background:white;padding:40px;border-radius:12px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.1);max-width:480px;}
+        h2{color:#c0392b;margin-bottom:12px;}p{color:#666;line-height:1.6;}</style></head>
+        <body><div class="card"><h2>❌ Ссылка не найдена</h2>
+        <p>Эта ссылка недействительна. Обратитесь к учителю.</p>
+        </div></body></html>`);
+    }
+
+    if (link.usage_count >= 1) {
+      return res.status(403).send(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+        <style>body{font-family:Arial;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f5f5f5;}
+        .card{background:white;padding:40px;border-radius:12px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.1);max-width:480px;}
+        h2{color:#c0392b;margin-bottom:12px;}p{color:#666;line-height:1.6;}</style></head>
+        <body><div class="card"><h2>🔒 Ссылка уже использована</h2>
+        <p>Эта ссылка была открыта ранее и больше не действует.<br>Обратитесь к учителю для получения новой ссылки.</p>
+        </div></body></html>`);
+    }
+
+    db.run('UPDATE links SET usage_count = 1 WHERE token = ?', [token]);
+    console.log(`📝 Открытие работы: ${token}`);
+    res.sendFile(path.join(__dirname, 'protected.html'));
+  });
 });
 
 app.post('/submit-work', async (req, res) => {
