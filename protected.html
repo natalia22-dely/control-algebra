@@ -760,73 +760,103 @@
 <script>
   let studentName = '';
   let token = window.location.pathname.split('/').pop();
-  let isBlocked = false;
   let workSubmitted = false;
+  let examStarted = false;       // защита включается только после старта
+  let protectionPaused = false;  // пауза при загрузке фото
   let theoryAnswered = {};
   let photoData = {};
-  let protectionPaused = false;
 
-  function pauseProtection() {
-    protectionPaused = true;
-    setTimeout(() => { protectionPaused = false; }, 30000);
-  }
-  function resumeProtection() {
-    setTimeout(() => { protectionPaused = false; }, 1000);
+  // ===== УВЕДОМЛЕНИЯ (вместо alert, чтобы не терять фокус) =====
+  function showNotice(msg, isError) {
+    let notice = document.getElementById('inline-notice');
+    if (!notice) {
+      notice = document.createElement('div');
+      notice.id = 'inline-notice';
+      notice.style.cssText = `
+        position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+        background: ${isError ? '#c0392b' : '#27ae60'}; color: white;
+        padding: 14px 28px; border-radius: 6px; font-family: 'Source Serif 4', serif;
+        font-size: 1rem; z-index: 9000; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        transition: opacity 0.4s;
+      `;
+      document.body.appendChild(notice);
+    }
+    notice.style.background = isError ? '#c0392b' : '#27ae60';
+    notice.textContent = msg;
+    notice.style.opacity = '1';
+    clearTimeout(notice._timer);
+    notice._timer = setTimeout(() => { notice.style.opacity = '0'; }, 3000);
   }
 
   // ===== ИМЯ И СТАРТ =====
   function startExam() {
     const nameInput = document.getElementById('student-name').value.trim();
     if (!nameInput) {
-      alert('Пожалуйста, введите ваше имя');
+      showNotice('Пожалуйста, введите ваше имя', true);
       return;
     }
     studentName = nameInput;
     document.getElementById('name-screen').style.display = 'none';
     document.getElementById('exam-screen').style.display = 'block';
     document.getElementById('header-student-name').textContent = studentName;
+    examStarted = true;
     setupAntiCheat();
     updateProgress();
+  }
+
+  // ===== ПАУЗА ЗАЩИТЫ (для загрузки фото) =====
+  function pauseProtection() {
+    protectionPaused = true;
+    clearTimeout(window._resumeTimer);
+    window._resumeTimer = setTimeout(() => { protectionPaused = false; }, 60000);
+  }
+  function resumeProtection() {
+    clearTimeout(window._resumeTimer);
+    window._resumeTimer = setTimeout(() => { protectionPaused = false; }, 1500);
   }
 
   // ===== АНТИШПАРГАЛКА =====
   function setupAntiCheat() {
     // Уход с вкладки
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden && !workSubmitted && !protectionPaused) {
+      if (!examStarted || workSubmitted || protectionPaused) return;
+      if (document.hidden) {
         logViolation('Уход с вкладки / переключение');
         showBlocked('Вы переключились на другую вкладку или свернули браузер. Попытка зафиксирована.');
       }
     });
 
-    // Потеря фокуса окна — с задержкой, чтобы клики по кнопкам не триггерили
+    // Потеря фокуса окна — с задержкой 500мс чтобы не срабатывать на внутренние клики
     window.addEventListener('blur', () => {
-      if (workSubmitted || protectionPaused) return;
-      // Ждём 300мс — если это просто клик по кнопке на странице, фокус вернётся сам
-      setTimeout(() => {
+      if (!examStarted || workSubmitted || protectionPaused) return;
+      clearTimeout(window._blurTimer);
+      window._blurTimer = setTimeout(() => {
         if (!document.hasFocus() && !workSubmitted && !protectionPaused) {
           logViolation('Потеря фокуса окна');
           showBlocked('Вы покинули окно браузера. Попытка зафиксирована.');
         }
-      }, 300);
+      }, 500);
     });
 
-    // Скриншот (PrintScreen)
+    // Возврат фокуса — отменяем таймер блокировки
+    window.addEventListener('focus', () => {
+      clearTimeout(window._blurTimer);
+    });
+
+    // Скриншот
     document.addEventListener('keydown', (e) => {
-      if (!workSubmitted && (e.key === 'PrintScreen' || (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === '4' || e.key === '3')))) {
+      if (!examStarted || workSubmitted) return;
+      if (e.key === 'PrintScreen' || (e.ctrlKey && e.shiftKey && ['S','4','3'].includes(e.key))) {
         logViolation('Попытка снимка экрана');
         showBlocked('Зафиксирована попытка сделать снимок экрана.');
       }
     });
 
     // Правая кнопка мыши
-    document.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-    });
+    document.addEventListener('contextmenu', (e) => { e.preventDefault(); });
   }
 
   function showBlocked(reason) {
-    isBlocked = true;
     document.getElementById('blocked-reason').textContent = reason;
     document.getElementById('blocked-screen').classList.add('active');
   }
@@ -843,34 +873,32 @@
   function selectOption(questionId, optionIdx, isCorrect, btn) {
     if (theoryAnswered[questionId]) return;
     const btns = document.querySelectorAll(`#${questionId}-options .option-btn`);
-    btns.forEach(b => b.classList.remove('selected'));
+    btns.forEach(b => { b.classList.remove('selected'); delete b.dataset.selected; });
     btn.classList.add('selected');
     btn.dataset.selected = 'true';
     btn.dataset.correct = isCorrect;
   }
 
   const theoryFeedback = {
-    t1: { correct: 'Верно! (5x + 3)² — это квадрат суммы: (a + b)² = a² + 2ab + b².', wrong: 'Неверно. Обратите внимание: оба выражения складываются и возводятся в квадрат — это формула квадрата суммы.' },
-    t2: { correct: 'Верно! (2a − 7b)(2a + 7b) — это произведение суммы и разности одних и тех же выражений.', wrong: 'Неверно. Здесь два одинаковых выражения (2a и 7b), но одно берётся с минусом, другое с плюсом — это произведение суммы и разности.' },
-    t3: { correct: 'Верно! Правильно: (a + 4)² = a² + 2·a·4 + 16 = a² + 8a + 16. Среднее слагаемое пропущено.', wrong: 'Неверно. По формуле квадрата суммы (a + b)² = a² + 2ab + b². Здесь пропущено слагаемое 2·a·4 = 8a.' },
-    t4: { correct: 'Верно! x² − 9 = (x − 3)(x + 3). Формула разности квадратов: a² − b² = (a − b)(a + b).', wrong: 'Неверно. Формула разности квадратов: a² − b² = (a − b)(a + b). Один множитель с минусом, другой с плюсом.' }
+    t1: { correct: 'Верно! (5x + 3)² — это квадрат суммы: (a + b)² = a² + 2ab + b².', wrong: 'Неверно. Оба выражения складываются и возводятся в квадрат — это формула квадрата суммы.' },
+    t2: { correct: 'Верно! (2a − 7b)(2a + 7b) — произведение суммы и разности одних и тех же выражений.', wrong: 'Неверно. Здесь два одинаковых выражения с разными знаками — это произведение суммы и разности.' },
+    t3: { correct: 'Верно! Правильно: (a + 4)² = a² + 8a + 16. Пропущено слагаемое 2·a·4 = 8a.', wrong: 'Неверно. По формуле (a + b)² = a² + 2ab + b². Пропущено слагаемое 2·a·4 = 8a.' },
+    t4: { correct: 'Верно! x² − 9 = (x − 3)(x + 3). Формула разности квадратов: a² − b² = (a−b)(a+b).', wrong: 'Неверно. Формула разности квадратов даёт (x−3)(x+3), а не (x−3)(x−3).' }
   };
 
   function checkTheory(qId) {
     if (theoryAnswered[qId]) return;
     const selected = document.querySelector(`#${qId}-options .option-btn[data-selected="true"]`);
-    if (!selected) { alert('Выберите вариант ответа'); return; }
+    if (!selected) { showNotice('Выберите вариант ответа', true); return; }
     const isCorrect = selected.dataset.correct === 'true';
     const feedbackEl = document.getElementById(`${qId}-feedback`);
-
     const allBtns = document.querySelectorAll(`#${qId}-options .option-btn`);
     allBtns.forEach(b => {
       b.disabled = true;
       if (b.dataset.correct === 'true') b.classList.add('correct');
     });
     if (!isCorrect) selected.classList.add('wrong');
-
-    feedbackEl.textContent = isCorrect ? '✓ ' + theoryFeedback[qId].correct : '✗ ' + theoryFeedback[qId].wrong;
+    feedbackEl.textContent = (isCorrect ? '✓ ' : '✗ ') + theoryFeedback[qId][isCorrect ? 'correct' : 'wrong'];
     feedbackEl.className = 'feedback-box show ' + (isCorrect ? 'correct' : 'wrong');
     theoryAnswered[qId] = true;
     updateProgress();
@@ -890,12 +918,13 @@
       };
       reader.readAsDataURL(file);
     });
+    resumeProtection();
   }
 
   // ===== ПРОГРЕСС =====
   function updateProgress() {
     const answered = Object.keys(theoryAnswered).length;
-    const pct = Math.round((answered / 4) * 40); // 40% за теорию
+    const pct = Math.round((answered / 4) * 40);
     document.getElementById('progress-fill').style.width = pct + '%';
   }
 
@@ -907,12 +936,16 @@
     const p2 = document.getElementById('p2-answer').value.trim();
     const p3 = document.getElementById('p3-answer').value.trim();
     if (!p1 && !p2 && !p3) {
-      alert('Пожалуйста, заполните хотя бы несколько практических заданий перед отправкой.');
+      showNotice('Заполните хотя бы несколько практических заданий', true);
       return;
     }
 
-    // Отключаем защиту на время отправки
+    // Полностью отключаем защиту перед отправкой
     protectionPaused = true;
+    workSubmitted = true;
+
+    const submitBtn = document.querySelector('.submit-btn');
+    if (submitBtn) { submitBtn.textContent = 'Отправка...'; submitBtn.disabled = true; }
 
     const payload = {
       token,
@@ -947,16 +980,19 @@
         body: JSON.stringify(payload)
       });
       if (res.ok) {
-        workSubmitted = true;
         document.getElementById('exam-screen').style.display = 'none';
         document.getElementById('success-screen').classList.add('active');
       } else {
+        workSubmitted = false;
         protectionPaused = false;
-        alert('Ошибка при отправке. Попробуйте ещё раз.');
+        if (submitBtn) { submitBtn.textContent = 'Сдать работу'; submitBtn.disabled = false; }
+        showNotice('Ошибка при отправке. Попробуйте ещё раз.', true);
       }
     } catch {
+      workSubmitted = false;
       protectionPaused = false;
-      alert('Нет соединения с сервером. Проверьте интернет и попробуйте снова.');
+      if (submitBtn) { submitBtn.textContent = 'Сдать работу'; submitBtn.disabled = false; }
+      showNotice('Нет соединения с сервером. Проверьте интернет.', true);
     }
   }
 </script>
